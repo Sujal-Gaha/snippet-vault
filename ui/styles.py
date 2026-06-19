@@ -20,6 +20,12 @@ DEFAULT_THEMES = {
         "secondary_background": "#313244",
         "text": "#cdd6f4",
     },
+    "Shadcn Default": {
+        "primary": "#ffffff",
+        "background": "#09090b",
+        "secondary_background": "#18181b",
+        "text": "#fafafa",
+    },
 }
 
 
@@ -63,6 +69,8 @@ def inject_custom_styles(settings_repo):
 
     st.html(f"""
     <style>
+        @import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
+
         /* Theme variables applied to root and key elements */
         :root, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stSidebar"] {{
             --primary-color: {primary} !important;
@@ -123,25 +131,39 @@ def inject_custom_styles(settings_repo):
         }}
         
         /* Streamlit primary/secondary buttons */
-        button[kind="primary"] {{
+        button[kind="primary"],
+        [data-testid="stPopoverBody"] button[kind="primary"] {{
             background-color: {primary} !important;
-            color: {bg} !important;
             border: none !important;
-            font-weight: 600 !important;
+        }}
+        button[kind="primary"],
+        button[kind="primary"] *,
+        [data-testid="stPopoverBody"] button[kind="primary"],
+        [data-testid="stPopoverBody"] button[kind="primary"] * {{
+            color: {bg} !important;
         }}
         button[kind="primary"]:hover {{
             opacity: 0.9 !important;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
         }}
+        button[kind="primary"]:hover * {{
+            opacity: 0.9 !important;
+        }}
+        
         button[kind="secondary"] {{
             background-color: {sec_bg} !important;
-            color: {text} !important;
             border: 1px solid rgba(128, 128, 128, 0.3) !important;
+        }}
+        button[kind="secondary"],
+        button[kind="secondary"] * {{
+            color: {text} !important;
         }}
         button[kind="secondary"]:hover {{
             border-color: {primary} !important;
-            color: {primary} !important;
             background-color: {bg} !important;
+        }}
+        button[kind="secondary"]:hover * {{
+            color: {primary} !important;
         }}
         
         /* Popovers background adjustment */
@@ -151,6 +173,53 @@ def inject_custom_styles(settings_repo):
         }}
         div[data-testid="stPopoverBody"] * {{
             color: {text} !important;
+        }}
+        
+        /* Style the st.popover trigger buttons to look like a clean, borderless menu icon */
+        div[data-testid="stPopover"] button {{
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 6px 12px !important;
+            margin: 0 !important;
+            width: auto !important;
+            min-width: 0 !important;
+            min-height: 0 !important;
+            color: {text} !important;
+            cursor: pointer !important;
+            transition: color 0.15s ease, background-color 0.15s ease !important;
+        }}
+        
+        div[data-testid="stPopover"] button:hover,
+        div[data-testid="stPopover"] button:active,
+        div[data-testid="stPopover"] button:focus {{
+            color: {primary} !important;
+            background-color: rgba(128, 128, 128, 0.15) !important;
+            border-radius: 50% !important;
+            outline: none !important;
+        }}
+        
+        /* Hide the chevron arrow inside the st.popover trigger button */
+        div[data-testid="stPopover"] button svg,
+        div[data-testid="stPopover"] button span[data-testid="stIcon"],
+        div[data-testid="stPopover"] button div[class*="chevron"],
+        div[data-testid="stPopover"] button svg[class*="chevron"],
+        div[data-testid="stPopover"] button > *:not(:first-child),
+        div[data-testid="stPopover"] button * > *:not(:first-child) {{
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }}
+        
+        /* Disable pseudo-elements representing icons */
+        div[data-testid="stPopover"] button::after,
+        div[data-testid="stPopover"] button::before,
+        div[data-testid="stPopover"] button *::after,
+        div[data-testid="stPopover"] button *::before {{
+            content: none !important;
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
         }}
         
         /* BaseWeb and Streamlit virtualized selectbox dropdown list styles (rendered outside .stApp via React portals) */
@@ -239,20 +308,24 @@ def inject_custom_styles(settings_repo):
             font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
         }}
         
-        /* Card design */
-        .snippet-card {{
-            background-color: {sec_bg};
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(128, 128, 128, 0.2);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        /* Card design for snippet blocks (including Streamlit's native st.container with border) */
+        .snippet-card,
+        div[data-testid="stVerticalBlockBorderWrapper"],
+        [data-testid="stVerticalBlockBorderWrapper"] {{
+            background-color: {sec_bg} !important;
+            border-radius: 12px !important;
+            padding: 24px !important;
+            margin-bottom: 24px !important;
+            border: 1px solid rgba(128, 128, 128, 0.2) !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03) !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
         }}
-        .snippet-card:hover {{
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-            border-color: {primary};
+        .snippet-card:hover,
+        div[data-testid="stVerticalBlockBorderWrapper"]:hover,
+        [data-testid="stVerticalBlockBorderWrapper"]:hover {{
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08) !important;
+            border-color: {primary} !important;
         }}
         .snippet-title {{
             color: {primary};
@@ -260,8 +333,14 @@ def inject_custom_styles(settings_repo):
             font-weight: 600;
             margin-bottom: 5px;
         }}
-        .snippet-card p, .snippet-card li, .snippet-card h1, .snippet-card h2, .snippet-card h3, .snippet-card h4 {{
-            color: {text};
+        .snippet-card p, .snippet-card li, .snippet-card h1, .snippet-card h2, .snippet-card h3, .snippet-card h4,
+        [data-testid="stVerticalBlockBorderWrapper"] p,
+        [data-testid="stVerticalBlockBorderWrapper"] li,
+        [data-testid="stVerticalBlockBorderWrapper"] h1,
+        [data-testid="stVerticalBlockBorderWrapper"] h2,
+        [data-testid="stVerticalBlockBorderWrapper"] h3,
+        [data-testid="stVerticalBlockBorderWrapper"] h4 {{
+            color: {text} !important;
             line-height: 1.6;
         }}
         /* Tags styling */
@@ -283,9 +362,9 @@ def inject_custom_styles(settings_repo):
         .type-badge-code {{
             background-color: {primary}dd; /* theme primary with some transparency */
             color: {bg};
-            padding: 3px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 0.6rem;
             font-weight: bold;
             text-transform: uppercase;
             margin-right: 12px;
@@ -295,9 +374,9 @@ def inject_custom_styles(settings_repo):
         .type-badge-command {{
             background-color: #bf616a;
             color: #eceff4;
-            padding: 3px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 0.6rem;
             font-weight: bold;
             text-transform: uppercase;
             margin-right: 12px;
@@ -307,14 +386,29 @@ def inject_custom_styles(settings_repo):
         .category-badge {{
             background-color: {bg};
             color: {primary};
-            padding: 3px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 500;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 0.6rem;
+            font-weight: bold;
             border: 1px solid rgba(128, 128, 128, 0.2);
             display: inline-block;
             vertical-align: middle;
             margin-right: 12px;
+        }}
+        
+        /* Collapse the layout container of the shortcut iframe to prevent empty spacing at the bottom */
+        div.element-container:has(> iframe),
+        div.element-container:has(> [data-testid="stIFrame"]),
+        div[data-testid="stIFrame"] {{
+            height: 0 !important;
+            min-height: 0 !important;
+            max-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            position: absolute !important;
         }}
     </style>
     """)
