@@ -4,7 +4,7 @@ from typing import Literal
 # Imports from modular packages
 from db.connection import DatabaseManager
 from db.repository import SQLSnippetRepository
-from ui.styles import inject_custom_styles
+from ui.styles import inject_custom_styles, load_themes_config, save_themes_config, DEFAULT_THEMES
 from ui.dialogs import add_snippet_dialog
 from ui.components import SnippetUIRenderer
 
@@ -48,6 +48,70 @@ with st.sidebar:
     # View Mode toggle state (initialized here, controlled by main buttons)
     if "view_mode" not in st.session_state:
         st.session_state.view_mode = "Full Details"
+
+    # Theme Settings configuration and management
+    themes_config = load_themes_config()
+    selected_theme = themes_config.get("selected_theme", "Nordic Dark (Default)")
+    custom_themes = themes_config.get("custom_themes", {})
+    
+    st.markdown("---")
+    st.header("🎨 Theme Settings")
+    
+    available_themes = list(DEFAULT_THEMES.keys()) + list(custom_themes.keys())
+    if selected_theme not in available_themes:
+        selected_theme = "Nordic Dark (Default)"
+        
+    theme_choice = st.selectbox(
+        "Select Theme",
+        options=available_themes + ["➕ Create Custom Theme..."],
+        index=available_themes.index(selected_theme) if selected_theme in available_themes else 0
+    )
+    
+    if theme_choice == "➕ Create Custom Theme...":
+        st.markdown("### ➕ Custom Theme Creator")
+        custom_name = st.text_input("Theme Name", placeholder="e.g. Lavender Dream").strip()
+        
+        # Use currently active theme colors as picker defaults
+        active_colors = DEFAULT_THEMES.get(selected_theme, custom_themes.get(selected_theme, DEFAULT_THEMES["Nordic Dark (Default)"]))
+        
+        col_p, col_bg = st.columns(2)
+        with col_p:
+            c_primary = st.color_picker("Primary Color", active_colors["primary"])
+        with col_bg:
+            c_bg = st.color_picker("Background Color", active_colors["background"])
+            
+        col_sec, col_txt = st.columns(2)
+        with col_sec:
+            c_sec = st.color_picker("Card Background", active_colors["secondary_background"])
+        with col_txt:
+            c_txt = st.color_picker("Text Color", active_colors["text"])
+            
+        if st.button("Save & Apply Theme", type="primary", use_container_width=True):
+            if not custom_name:
+                st.error("Theme name cannot be empty.")
+            elif custom_name in DEFAULT_THEMES or custom_name == "➕ Create Custom Theme...":
+                st.error("Cannot overwrite predefined default themes.")
+            else:
+                custom_themes[custom_name] = {
+                    "primary": c_primary,
+                    "background": c_bg,
+                    "secondary_background": c_sec,
+                    "text": c_txt
+                }
+                save_themes_config(custom_name, custom_themes)
+                st.success(f"Theme '{custom_name}' applied and saved!")
+                st.rerun()
+    else:
+        if theme_choice != selected_theme:
+            save_themes_config(theme_choice, custom_themes)
+            st.rerun()
+            
+        if theme_choice in custom_themes:
+            if st.button("🗑️ Delete Custom Theme", use_container_width=True):
+                del custom_themes[theme_choice]
+                save_themes_config("Nordic Dark (Default)", custom_themes)
+                st.success(f"Theme '{theme_choice}' deleted!")
+                st.rerun()
 
     st.markdown("---")
     st.header("📊 Vault Statistics")
@@ -148,35 +212,50 @@ else:
             renderer.render_list(filtered_snippets, unique_cats)
 
 # Keyboard shortcut handler (Alt + N) to trigger the popup modal
-st.html("""
+st.iframe("""
 <script>
-    // Attach listener directly to document
-    if (!window.__shortcut_attached__) {
-        window.__shortcut_attached__ = true;
-        
-        document.addEventListener('keydown', function(e) {
-            // Check if user is typing in a form input or text area
-            const active = document.activeElement;
-            if (active && (
-                active.tagName === 'INPUT' || 
-                active.tagName === 'TEXTAREA' || 
-                active.contentEditable === 'true' ||
-                active.closest('.stTextInput') ||
-                active.closest('.stTextArea')
-            )) {
-                return; 
-            }
+    (function() {
+        try {
+            const parentWin = window.parent;
+            const parentDoc = parentWin.document;
             
-            // Check for Alt+N keypress
-            if (e.altKey && e.key.toLowerCase() === 'n') {
-                e.preventDefault();
-                const buttons = Array.from(document.querySelectorAll('button'));
-                const addBtn = buttons.find(btn => btn.textContent.includes('Add Snippet'));
-                if (addBtn) {
-                    addBtn.click();
-                }
+            if (parentWin.__shortcut_attached__) {
+                return;
             }
-        });
-    }
+            parentWin.__shortcut_attached__ = true;
+            
+            parentDoc.addEventListener('keydown', function(e) {
+                try {
+                    // Check if user is typing in a form input or text area
+                    const active = parentDoc.activeElement;
+                    if (active && (
+                        active.tagName === 'INPUT' || 
+                        active.tagName === 'TEXTAREA' || 
+                        active.contentEditable === 'true' ||
+                        active.closest('.stTextInput') ||
+                        active.closest('.stTextArea')
+                    )) {
+                        return; 
+                    }
+                    
+                    // Check for Alt+N keypress
+                    if (e.altKey && (e.key === 'n' || e.key === 'N' || e.keyCode === 78)) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const buttons = Array.from(parentDoc.querySelectorAll('button'));
+                        const addBtn = buttons.find(btn => btn.textContent && btn.textContent.includes('Add Snippet'));
+                        if (addBtn) {
+                            addBtn.click();
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error in shortcut keydown listener:", err);
+                }
+            }, true);
+        } catch (e) {
+            console.error("Failed to attach global keydown listener from iframe:", e);
+        }
+    })();
 </script>
-""")
+""", height=1)

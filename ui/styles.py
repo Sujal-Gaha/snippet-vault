@@ -1,57 +1,224 @@
+import os
+import json
 import streamlit as st
 
+THEMES_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", "user_themes.json")
+
+DEFAULT_THEMES = {
+    "Nordic Dark (Default)": {
+        "primary": "#88c0d0",
+        "background": "#2e3440",
+        "secondary_background": "#3b4252",
+        "text": "#eceff4"
+    },
+    "Rose Theme": {
+        "primary": "#ebbcba",
+        "background": "#191724",
+        "secondary_background": "#26233a",
+        "text": "#e0def4"
+    },
+    "Catppuccin Mocha": {
+        "primary": "#cba6f7",
+        "background": "#1e1e2e",
+        "secondary_background": "#313244",
+        "text": "#cdd6f4"
+    }
+}
+
+def load_themes_config():
+    """Loads custom themes and the selected theme from user_themes.json."""
+    if os.path.exists(THEMES_FILE):
+        try:
+            with open(THEMES_FILE, "r") as f:
+                data = json.load(f)
+                # Ensure structure is correct
+                if isinstance(data, dict) and "selected_theme" in data:
+                    if "custom_themes" not in data or not isinstance(data["custom_themes"], dict):
+                        data["custom_themes"] = {}
+                    return data
+        except Exception:
+            pass
+    return {"selected_theme": "Nordic Dark (Default)", "custom_themes": {}}
+
+def save_themes_config(selected_theme, custom_themes):
+    """Saves custom themes and the selected theme to user_themes.json."""
+    try:
+        os.makedirs(os.path.dirname(THEMES_FILE), exist_ok=True)
+        with open(THEMES_FILE, "w") as f:
+            json.dump({
+                "selected_theme": selected_theme,
+                "custom_themes": custom_themes
+            }, f, indent=4)
+    except Exception as e:
+        print(f"Error saving themes config: {e}")
+
 def inject_custom_styles():
-    st.html("""
+    config = load_themes_config()
+    selected_name = config.get("selected_theme", "Nordic Dark (Default)")
+    custom_themes = config.get("custom_themes", {})
+    
+    if selected_name in DEFAULT_THEMES:
+        theme_colors = DEFAULT_THEMES[selected_name]
+    elif selected_name in custom_themes:
+        theme_colors = custom_themes[selected_name]
+    else:
+        theme_colors = DEFAULT_THEMES["Nordic Dark (Default)"]
+        
+    primary = theme_colors.get("primary", "#88c0d0")
+    bg = theme_colors.get("background", "#2e3440")
+    sec_bg = theme_colors.get("secondary_background", "#3b4252")
+    text = theme_colors.get("text", "#eceff4")
+
+    st.html(f"""
     <style>
+        /* Theme variables applied to root and key elements */
+        :root, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stSidebar"] {{
+            --primary-color: {primary} !important;
+            --background-color: {bg} !important;
+            --secondary-background-color: {sec_bg} !important;
+            --text-color: {text} !important;
+            
+            /* Streamlit specific variables to trigger theme colors on elements */
+            --st-color-background: {bg} !important;
+            --st-color-background-secondary: {sec_bg} !important;
+            --st-color-text: {text} !important;
+            --st-color-primary: {primary} !important;
+        }}
+        
+        /* Core layout and app container backgrounds */
+        .stApp {{
+            background-color: {bg} !important;
+            color: {text} !important;
+        }}
+        [data-testid="stAppViewContainer"] {{
+            background-color: {bg} !important;
+            color: {text} !important;
+        }}
+        [data-testid="stHeader"] {{
+            background-color: {bg} !important;
+        }}
+        [data-testid="stSidebar"] {{
+            background-color: {sec_bg} !important;
+            border-right: 1px solid rgba(128, 128, 128, 0.1) !important;
+        }}
+        
+        /* Sidebar elements overrides */
+        [data-testid="stSidebar"] .stMarkdown p,
+        [data-testid="stSidebar"] span,
+        [data-testid="stSidebar"] h1,
+        [data-testid="stSidebar"] h2,
+        [data-testid="stSidebar"] h3,
+        [data-testid="stSidebar"] label {{
+            color: {text} !important;
+        }}
+
+        /* Input fields and dropdown select components */
+        div[data-baseweb="select"] > div, 
+        div[data-baseweb="input"] > div,
+        div[data-baseweb="base-input"] > input,
+        textarea,
+        input {{
+            background-color: {bg} !important;
+            color: {text} !important;
+            border-color: rgba(128, 128, 128, 0.2) !important;
+        }}
+        
+        div[data-baseweb="select"] > div:hover, 
+        div[data-baseweb="input"] > div:hover,
+        textarea:hover,
+        input:hover {{
+            border-color: {primary} !important;
+        }}
+        
+        /* Streamlit primary/secondary buttons */
+        button[kind="primary"] {{
+            background-color: {primary} !important;
+            color: {bg} !important;
+            border: none !important;
+            font-weight: 600 !important;
+        }}
+        button[kind="primary"]:hover {{
+            opacity: 0.9 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }}
+        button[kind="secondary"] {{
+            background-color: {sec_bg} !important;
+            color: {text} !important;
+            border: 1px solid rgba(128, 128, 128, 0.3) !important;
+        }}
+        button[kind="secondary"]:hover {{
+            border-color: {primary} !important;
+            color: {primary} !important;
+            background-color: {bg} !important;
+        }}
+        
+        /* Popovers background adjustment */
+        div[data-testid="stPopoverBody"] {{
+            background-color: {sec_bg} !important;
+            border: 1px solid rgba(128, 128, 128, 0.2) !important;
+        }}
+        div[data-testid="stPopoverBody"] * {{
+            color: {text} !important;
+        }}
+        
+        /* Metric widget styling */
+        [data-testid="stMetricValue"] {{
+            color: {primary} !important;
+        }}
+        [data-testid="stMetricLabel"] {{
+            color: {text} !important;
+            opacity: 0.8;
+        }}
+
         /* Global Font override (targeting text elements only to protect icon fonts) */
-        html, body, p, li, h1, h2, h3, h4, span.snippet-title, .snippet-desc {
+        html, body, p, li, h1, h2, h3, h4, span.snippet-title, .snippet-desc {{
             font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
-        }
+        }}
         
         /* Card design */
-        .snippet-card {
-            background-color: var(--secondary-background-color);
+        .snippet-card {{
+            background-color: {sec_bg};
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 24px;
             border: 1px solid rgba(128, 128, 128, 0.2);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-        }
-        .snippet-card:hover {
+        }}
+        .snippet-card:hover {{
             transform: translateY(-2px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-            border-color: var(--primary-color);
-        }
-        .snippet-title {
-            color: var(--primary-color);
+            border-color: {primary};
+        }}
+        .snippet-title {{
+            color: {primary};
             font-size: 1.4rem;
             font-weight: 600;
             margin-bottom: 5px;
-        }
-        .snippet-card p, .snippet-card li, .snippet-card h1, .snippet-card h2, .snippet-card h3, .snippet-card h4 {
-            color: var(--text-color);
+        }}
+        .snippet-card p, .snippet-card li, .snippet-card h1, .snippet-card h2, .snippet-card h3, .snippet-card h4 {{
+            color: {text};
             line-height: 1.6;
-        }
+        }}
         /* Tags styling */
-        .tag-container {
+        .tag-container {{
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             margin-top: 15px;
-        }
-        .tag-badge {
-            background-color: var(--background-color);
-            color: var(--text-color);
+        }}
+        .tag-badge {{
+            background-color: {bg};
+            color: {text};
             padding: 4px 12px;
             border-radius: 16px;
             font-size: 0.8rem;
             font-weight: 500;
             border: 1px solid rgba(128, 128, 128, 0.2);
-        }
-        .type-badge-code {
-            background-color: #5e81ac;
-            color: #eceff4;
+        }}
+        .type-badge-code {{
+            background-color: {primary}dd; /* theme primary with some transparency */
+            color: {bg};
             padding: 3px 10px;
             border-radius: 6px;
             font-size: 0.75rem;
@@ -60,8 +227,8 @@ def inject_custom_styles():
             margin-right: 12px;
             display: inline-block;
             vertical-align: middle;
-        }
-        .type-badge-command {
+        }}
+        .type-badge-command {{
             background-color: #bf616a;
             color: #eceff4;
             padding: 3px 10px;
@@ -72,10 +239,10 @@ def inject_custom_styles():
             margin-right: 12px;
             display: inline-block;
             vertical-align: middle;
-        }
-        .category-badge {
-            background-color: var(--background-color);
-            color: var(--primary-color);
+        }}
+        .category-badge {{
+            background-color: {bg};
+            color: {primary};
             padding: 3px 10px;
             border-radius: 6px;
             font-size: 0.75rem;
@@ -84,6 +251,6 @@ def inject_custom_styles():
             display: inline-block;
             vertical-align: middle;
             margin-right: 12px;
-        }
+        }}
     </style>
     """)
