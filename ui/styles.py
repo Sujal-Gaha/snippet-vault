@@ -1,69 +1,61 @@
-import os
 import json
 import streamlit as st
-
-THEMES_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", "user_themes.json")
 
 DEFAULT_THEMES = {
     "Nordic Dark (Default)": {
         "primary": "#88c0d0",
         "background": "#2e3440",
         "secondary_background": "#3b4252",
-        "text": "#eceff4"
+        "text": "#eceff4",
     },
     "Rose Theme": {
         "primary": "#ebbcba",
         "background": "#191724",
         "secondary_background": "#26233a",
-        "text": "#e0def4"
+        "text": "#e0def4",
     },
     "Catppuccin Mocha": {
         "primary": "#cba6f7",
         "background": "#1e1e2e",
         "secondary_background": "#313244",
-        "text": "#cdd6f4"
-    }
+        "text": "#cdd6f4",
+    },
 }
 
-def load_themes_config():
-    """Loads custom themes and the selected theme from user_themes.json."""
-    if os.path.exists(THEMES_FILE):
-        try:
-            with open(THEMES_FILE, "r") as f:
-                data = json.load(f)
-                # Ensure structure is correct
-                if isinstance(data, dict) and "selected_theme" in data:
-                    if "custom_themes" not in data or not isinstance(data["custom_themes"], dict):
-                        data["custom_themes"] = {}
-                    return data
-        except Exception:
-            pass
-    return {"selected_theme": "Nordic Dark (Default)", "custom_themes": {}}
 
-def save_themes_config(selected_theme, custom_themes):
-    """Saves custom themes and the selected theme to user_themes.json."""
+def load_themes_config(settings_repo):
+    """Loads custom themes and the selected theme from the database settings."""
     try:
-        os.makedirs(os.path.dirname(THEMES_FILE), exist_ok=True)
-        with open(THEMES_FILE, "w") as f:
-            json.dump({
-                "selected_theme": selected_theme,
-                "custom_themes": custom_themes
-            }, f, indent=4)
+        selected_theme = settings_repo.get("selected_theme", "Nordic Dark (Default)")
+        custom_themes_json = settings_repo.get("custom_themes", "{}")
+        custom_themes = json.loads(custom_themes_json)
+        return {"selected_theme": selected_theme, "custom_themes": custom_themes}
     except Exception as e:
-        print(f"Error saving themes config: {e}")
+        print(f"Error loading themes from database: {e}")
+        return {"selected_theme": "Nordic Dark (Default)", "custom_themes": {}}
 
-def inject_custom_styles():
-    config = load_themes_config()
+
+def save_themes_config(settings_repo, selected_theme, custom_themes):
+    """Saves custom themes and the selected theme to the database settings."""
+    try:
+        settings_repo.set("selected_theme", selected_theme)
+        settings_repo.set("custom_themes", json.dumps(custom_themes))
+    except Exception as e:
+        print(f"Error saving themes to database: {e}")
+
+
+def inject_custom_styles(settings_repo):
+    config = load_themes_config(settings_repo)
     selected_name = config.get("selected_theme", "Nordic Dark (Default)")
     custom_themes = config.get("custom_themes", {})
-    
+
     if selected_name in DEFAULT_THEMES:
         theme_colors = DEFAULT_THEMES[selected_name]
     elif selected_name in custom_themes:
         theme_colors = custom_themes[selected_name]
     else:
         theme_colors = DEFAULT_THEMES["Nordic Dark (Default)"]
-        
+
     primary = theme_colors.get("primary", "#88c0d0")
     bg = theme_colors.get("background", "#2e3440")
     sec_bg = theme_colors.get("secondary_background", "#3b4252")
@@ -161,6 +153,78 @@ def inject_custom_styles():
             color: {text} !important;
         }}
         
+        /* BaseWeb and Streamlit virtualized selectbox dropdown list styles (rendered outside .stApp via React portals) */
+        div[data-baseweb="popover"],
+        div[data-baseweb="popover"] > div,
+        div[data-baseweb="menu"],
+        div[data-baseweb="menu"] > div,
+        ul[role="listbox"],
+        ul[role="listbox"] div,
+        div[data-testid="stVirtualDropdown"],
+        div[data-testid="stVirtualDropdown"] > div,
+        [data-testid="stVirtualDropdown"] {{
+            background-color: {sec_bg} !important;
+            border-color: rgba(128, 128, 128, 0.2) !important;
+        }}
+        div[data-baseweb="popover"] ul,
+        div[data-baseweb="menu"] ul,
+        div[data-testid="stVirtualDropdown"] ul {{
+            background-color: {sec_bg} !important;
+        }}
+        div[data-baseweb="popover"] ul *,
+        div[data-baseweb="menu"] *,
+        div[data-testid="stVirtualDropdown"] *,
+        [data-testid="stVirtualDropdown"] * {{
+            background-color: transparent !important;
+            color: {text} !important;
+        }}
+        
+        /* Global Listbox & Option styling overrides (selectbox dropdown items and nested wrappers) */
+        [role="listbox"],
+        [role="listbox"] *,
+        [role="option"],
+        [role="option"] *,
+        [role="option"] > div,
+        [role="option"] > span,
+        div[data-baseweb="popover"] li,
+        div[data-baseweb="menu"] li,
+        li[role="option"],
+        div[role="option"],
+        [data-testid="stVirtualDropdown"] div[role="option"] {{
+            background-color: {sec_bg} !important;
+            color: {text} !important;
+            transition: background-color 0.1s ease !important;
+        }}
+        
+        /* Highlighted/Hovered states for options and all descendants (forcing colors to Mauve and Base background) */
+        [role="option"]:hover,
+        [role="option"]:hover *,
+        [role="option"][aria-selected="true"],
+        [role="option"][aria-selected="true"] *,
+        [role="option"][data-highlighted="true"],
+        [role="option"][data-highlighted="true"] *,
+        [data-active="true"],
+        [data-active="true"] *,
+        li[role="option"]:hover,
+        li[role="option"]:hover *,
+        div[role="option"]:hover,
+        div[role="option"]:hover *,
+        div[data-baseweb="popover"] li:hover,
+        div[data-baseweb="popover"] li:hover *,
+        div[data-baseweb="popover"] li[aria-selected="true"],
+        div[data-baseweb="popover"] li[aria-selected="true"] *,
+        div[data-baseweb="popover"] li[data-highlighted="true"],
+        div[data-baseweb="popover"] li[data-highlighted="true"] *,
+        div[data-baseweb="menu"] li:hover,
+        div[data-baseweb="menu"] li:hover *,
+        [data-testid="stVirtualDropdown"] div[role="option"]:hover,
+        [data-testid="stVirtualDropdown"] div[role="option"]:hover *,
+        [data-testid="stVirtualDropdown"] [data-active="true"],
+        [data-testid="stVirtualDropdown"] [data-active="true"] * {{
+            background-color: {primary} !important;
+            color: {bg} !important;
+        }}
+        
         /* Metric widget styling */
         [data-testid="stMetricValue"] {{
             color: {primary} !important;
@@ -170,8 +234,8 @@ def inject_custom_styles():
             opacity: 0.8;
         }}
 
-        /* Global Font override (targeting text elements only to protect icon fonts) */
-        html, body, p, li, h1, h2, h3, h4, span.snippet-title, .snippet-desc {{
+        /* Global Segoe UI Font override (targeting text elements and controls while protecting icons) */
+        html, body, p, li, h1, h2, h3, h4, label, input, select, textarea, button, .snippet-title, .snippet-desc {{
             font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
         }}
         

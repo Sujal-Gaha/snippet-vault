@@ -1,18 +1,16 @@
 import os
 import sqlite3
+import pymysql
+
 from config.settings import settings
 
-try:
-    import pymysql
-except ImportError:
-    pymysql = None
 
 class DatabaseManager:
     """Manages database connection lifecycle and schema initializations for SQLite and MySQL."""
-    
+
     def __init__(self):
         self.db_type = settings.db.db_type
-        
+
         if self.db_type == "mysql":
             if pymysql is None:
                 raise ImportError(
@@ -36,7 +34,7 @@ class DatabaseManager:
                 port=self.port,
                 database=self.db_name,
                 user=self.user,
-                password=self.password
+                password=self.password,
             )
         else:
             # If default db_file has a parent path, create it
@@ -49,7 +47,7 @@ class DatabaseManager:
         """Performs initial schema setup and database migrations."""
         conn = self.get_connection()
         c = conn.cursor()
-        
+
         if self.db_type == "mysql":
             # MySQL schema setup
             c.execute("""
@@ -65,18 +63,26 @@ class DatabaseManager:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
-            
+            c.execute("""
+                CREATE TABLE IF NOT EXISTS settings (
+                    setting_key VARCHAR(255) PRIMARY KEY,
+                    setting_value TEXT NOT NULL
+                )
+            """)
+
             # Migration check: check if category exists in mysql
             c.execute("""
                 SELECT column_name 
                 FROM information_schema.columns 
                 WHERE table_schema = DATABASE() 
-                  AND table_name = 'snippets' 
-                  AND column_name = 'category'
+                AND table_name = 'snippets' 
+                AND column_name = 'category'
             """)
             category_exists = bool(c.fetchone())
             if not category_exists:
-                c.execute("ALTER TABLE snippets ADD COLUMN category VARCHAR(100) DEFAULT 'Uncategorized'")
+                c.execute(
+                    "ALTER TABLE snippets ADD COLUMN category VARCHAR(100) DEFAULT 'Uncategorized'"
+                )
         else:
             # SQLite schema setup
             c.execute("""
@@ -92,14 +98,20 @@ class DatabaseManager:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
-            
+            c.execute("""
+                CREATE TABLE IF NOT EXISTS settings (
+                    setting_key TEXT PRIMARY KEY,
+                    setting_value TEXT NOT NULL
+                )
+            """)
+
             # Migration check: check if category exists in SQLite
             c.execute("PRAGMA table_info(snippets)")
             columns = [col[1] for col in c.fetchall()]
             if "category" not in columns:
-                c.execute("ALTER TABLE snippets ADD COLUMN category TEXT DEFAULT 'Uncategorized'")
-                
+                c.execute(
+                    "ALTER TABLE snippets ADD COLUMN category TEXT DEFAULT 'Uncategorized'"
+                )
+
         conn.commit()
         conn.close()
-
-
