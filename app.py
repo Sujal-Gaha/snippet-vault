@@ -1,3 +1,4 @@
+import json
 import streamlit as st
 from typing import Literal
 
@@ -7,6 +8,7 @@ from db.repository import SQLSnippetRepository, SQLSettingsRepository
 from ui.styles import (
     inject_custom_styles,
     load_themes_config,
+    get_keyboard_shortcuts,
 )
 from ui.components import (
     SnippetUIRenderer,
@@ -15,6 +17,7 @@ from ui.components import (
     render_selectbox,
     add_snippet_dialog,
     theme_gallery_dialog,
+    shortcuts_dialog,
 )
 
 # Page Configuration
@@ -27,6 +30,10 @@ db_manager = DatabaseManager()
 db_manager.init_db()
 settings_repository = SQLSettingsRepository(db_manager)
 repository = SQLSnippetRepository(db_manager)
+
+# Load data and keyboard shortcuts early
+snippets = repository.get_all()
+shortcuts = get_keyboard_shortcuts(settings_repository)
 
 # Inject CSS styles (using database preferences)
 inject_custom_styles(settings_repository)
@@ -43,12 +50,10 @@ with col_title:
     )
 with col_btn:
     st.markdown("<div style='height: 25px;'></div>", unsafe_allow_html=True)
-    if render_button("Add Snippet (Alt+N)", type="primary", use_container_width=True):
+    add_shortcut = shortcuts.get("add_snippet", "Alt+N")
+    if render_button(f"Add Snippet ({add_shortcut})", type="primary", use_container_width=True):
         # Open Dialog, injecting the dependency repository instance
         add_snippet_dialog(repository)
-
-# Load Snippets Data
-snippets = repository.get_all()
 
 # Sidebar Configuration & Stats
 with st.sidebar:
@@ -60,6 +65,9 @@ with st.sidebar:
 
     if "show_theme_gallery" not in st.session_state:
         st.session_state.show_theme_gallery = False
+
+    if "show_shortcuts" not in st.session_state:
+        st.session_state.show_shortcuts = False
 
     # Theme Settings configuration and management
     themes_config = load_themes_config(settings_repository)
@@ -85,7 +93,14 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### Keyboard Shortcuts")
-    st.markdown("- **`Alt + N`**: Add new snippet\n" "- **`Alt + S`**: Toggle sidebar")
+    st.markdown(
+        f"- **`{shortcuts.get('add_snippet', 'Alt+N')}`**: Add new snippet\n"
+        f"- **`{shortcuts.get('toggle_sidebar', 'Alt+S')}`**: Toggle sidebar\n"
+        f"- **`{shortcuts.get('show_shortcuts', 'Alt+/')}`**: Shortcuts guide & settings"
+    )
+    if render_button("Configure Shortcuts", use_container_width=True, key="config_shortcuts_sidebar_btn"):
+        st.session_state.show_shortcuts = True
+        st.rerun()
 
     st.markdown("---")
     st.markdown("### Formatting Guide")
@@ -195,22 +210,48 @@ else:
 if st.session_state.get("show_theme_gallery", False):
     theme_gallery_dialog(settings_repository)
 
-# Keyboard shortcut handler (Alt + N) to trigger the popup modal
+# Show shortcuts configuration dialog if requested
+if st.session_state.get("show_shortcuts", False):
+    st.session_state.show_shortcuts = False
+    shortcuts_dialog(settings_repository)
+
+# Keyboard shortcut handler using dynamic database settings
 st.iframe(
-    """
+    f"""
 <script>
-    (function() {
-        try {
+    (function() {{
+        try {{
             const parentWin = window.parent;
             const parentDoc = parentWin.document;
             
-            if (parentWin.__shortcut_attached__) {
+            // Always update shortcuts config in the parent window namespace
+            parentWin.__shortcuts_config__ = {json.dumps(shortcuts)};
+            
+            if (parentWin.__shortcut_attached__) {{
                 return;
-            }
+            }}
             parentWin.__shortcut_attached__ = true;
             
-            parentDoc.addEventListener('keydown', function(e) {
-                try {
+            function matchShortcut(e, shortcutStr) {{
+                if (!shortcutStr) return false;
+                const parts = shortcutStr.split('+').map(p => p.trim().toLowerCase());
+                const hasAlt = parts.includes('alt');
+                const hasCtrl = parts.includes('ctrl');
+                const hasShift = parts.includes('shift');
+                
+                const keyPart = parts.find(p => p !== 'alt' && p !== 'ctrl' && p !== 'shift');
+                if (!keyPart) return false;
+                
+                if (e.altKey !== hasAlt) return false;
+                if (e.ctrlKey !== hasCtrl) return false;
+                if (e.shiftKey !== hasShift) return false;
+                
+                const eventKey = e.key ? e.key.toLowerCase() : '';
+                return eventKey === keyPart;
+            }}
+            
+            parentDoc.addEventListener('keydown', function(e) {{
+                try {{
                     // Check if user is typing in a form input or text area
                     const active = parentDoc.activeElement;
                     if (active && (
@@ -219,52 +260,66 @@ st.iframe(
                         active.contentEditable === 'true' ||
                         active.closest('.stTextInput') ||
                         active.closest('.stTextArea')
-                    )) {
+                    )) {{
                         return; 
-                    }
+                    }}
                     
-                    // Check for Alt+N keypress
-                    if (e.altKey && (e.key === 'n' || e.key === 'N' || e.keyCode === 78)) {
+                    const currentShortcuts = parentWin.__shortcuts_config__ || {{}};
+                    
+                    // 1. Add Snippet Shortcut
+                    if (matchShortcut(e, currentShortcuts.add_snippet)) {{
                         e.preventDefault();
                         e.stopPropagation();
                         
                         const buttons = Array.from(parentDoc.querySelectorAll('button'));
                         const addBtn = buttons.find(btn => btn.textContent && btn.textContent.includes('Add Snippet'));
-                        if (addBtn) {
+                        if (addBtn) {{
                             addBtn.click();
-                        }
-                    }
+                        }}
+                    }}
                     
-                    // Check for Alt+S keypress (Toggle Sidebar)
-                    if (e.altKey && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
+                    // 2. Toggle Sidebar Shortcut
+                    if (matchShortcut(e, currentShortcuts.toggle_sidebar)) {{
                         e.preventDefault();
                         e.stopPropagation();
                         
                         const expandBtn = parentDoc.querySelector('[data-testid="collapsedControl"]') || 
                                           parentDoc.querySelector('button[aria-label="Expand sidebar"]');
-                        if (expandBtn) {
+                        if (expandBtn) {{
                             expandBtn.click();
-                        } else {
+                        }} else {{
                             const collapseBtn = parentDoc.querySelector('[data-testid="stSidebarCollapseButton"]') || 
                                                 parentDoc.querySelector('button[aria-label="Collapse sidebar"]');
-                            if (collapseBtn) {
+                            if (collapseBtn) {{
                                 const actualBtn = collapseBtn.tagName === 'BUTTON' ? collapseBtn : collapseBtn.querySelector('button');
-                                if (actualBtn) {
+                                if (actualBtn) {{
                                     actualBtn.click();
-                                } else {
+                                }} else {{
                                     collapseBtn.click();
-                                }
-                            }
-                        }
-                    }
-                } catch (err) {
+                                }}
+                            }}
+                        }}
+                    }}
+                    
+                    // 3. Show Shortcuts Shortcut
+                    if (matchShortcut(e, currentShortcuts.show_shortcuts)) {{
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const buttons = Array.from(parentDoc.querySelectorAll('button'));
+                        const configBtn = buttons.find(btn => btn.textContent && btn.textContent.includes('Configure Shortcuts'));
+                        if (configBtn) {{
+                            configBtn.click();
+                        }}
+                    }}
+                }} catch (err) {{
                     console.error("Error in shortcut keydown listener:", err);
-                }
-            }, true);
-        } catch (e) {
+                }}
+            }}, true);
+        }} catch (e) {{
             console.error("Failed to attach global keydown listener from iframe:", e);
-        }
-    })();
+        }}
+    }})();
 </script>
 """,
     height=1,

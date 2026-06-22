@@ -25,6 +25,24 @@ def save_themes_config(settings_repo, selected_theme, custom_themes):
         print(f"Error saving themes to database: {e}")
 
 
+DEFAULT_KEYBOARD_SHORTCUTS = {
+    "add_snippet": "Alt+N",
+    "toggle_sidebar": "Alt+S",
+    "show_shortcuts": "Alt+/",
+}
+
+
+def get_keyboard_shortcuts(settings_repo):
+    """Loads keyboard shortcuts configuration from database settings."""
+    try:
+        shortcuts_json = settings_repo.get("keyboard_shortcuts", None)
+        if shortcuts_json:
+            return json.loads(shortcuts_json)
+    except Exception as e:
+        print(f"Error loading keyboard shortcuts from database: {e}")
+    return DEFAULT_KEYBOARD_SHORTCUTS.copy()
+
+
 def format_font_family_string(font_str):
     """Formats a font family list string ensuring multi-word fonts without quotes are properly quoted."""
     if not font_str:

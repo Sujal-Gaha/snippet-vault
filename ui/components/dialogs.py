@@ -529,3 +529,74 @@ def theme_gallery_dialog(settings_repo):
                 st.session_state.temp_theme = custom_name
                 st.toast(f"Theme '{custom_name}' applied and saved!")
                 st.rerun()
+
+
+@st.dialog("Keyboard Shortcuts", width="medium")
+def shortcuts_dialog(settings_repo):
+    import json
+    from ui.styles import get_keyboard_shortcuts, DEFAULT_KEYBOARD_SHORTCUTS
+    
+    st.markdown("Customize keyboard shortcuts. Refresh the page to apply new bindings. Keyboard combinations must be formatted like: `Alt+N`, `Ctrl+Shift+A`, `Alt+/` etc.")
+    
+    shortcuts = get_keyboard_shortcuts(settings_repo)
+    
+    st.write("---")
+    
+    col_labels, col_inputs = st.columns([1.8, 1.2])
+    new_shortcuts = {}
+    
+    # 1. Add Snippet Shortcut
+    with col_labels:
+        st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+        st.markdown("**Add New Snippet**")
+    with col_inputs:
+        new_shortcuts["add_snippet"] = render_text_input(
+            "Add Snippet Key",
+            value=shortcuts.get("add_snippet", "Alt+N"),
+            label_visibility="collapsed",
+            key="shortcut_add_snippet"
+        )
+        
+    # 2. Toggle Sidebar Shortcut
+    with col_labels:
+        st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+        st.markdown("**Toggle Sidebar**")
+    with col_inputs:
+        new_shortcuts["toggle_sidebar"] = render_text_input(
+            "Toggle Sidebar Key",
+            value=shortcuts.get("toggle_sidebar", "Alt+S"),
+            label_visibility="collapsed",
+            key="shortcut_toggle_sidebar"
+        )
+        
+    # 3. Show Shortcuts Shortcut
+    with col_labels:
+        st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+        st.markdown("**Show Keyboard Shortcuts Dialog**")
+    with col_inputs:
+        new_shortcuts["show_shortcuts"] = render_text_input(
+            "Show Shortcuts Key",
+            value=shortcuts.get("show_shortcuts", "Alt+/"),
+            label_visibility="collapsed",
+            key="shortcut_show_shortcuts"
+        )
+        
+    st.write("---")
+    btn_col1, btn_col2 = st.columns(2)
+    with btn_col1:
+        if render_button("Save Shortcuts", type="primary", use_container_width=True, key="save_shortcuts_btn"):
+            valid = True
+            for k, v in new_shortcuts.items():
+                if not v.strip():
+                    st.error(f"Shortcut key combo cannot be empty.")
+                    valid = False
+                    break
+            if valid:
+                settings_repo.set("keyboard_shortcuts", json.dumps({k: v.strip() for k, v in new_shortcuts.items()}))
+                st.success("Shortcuts saved! Rerunning...")
+                st.rerun()
+    with btn_col2:
+        if render_button("Reset to Defaults", type="secondary", use_container_width=True, key="reset_shortcuts_btn"):
+            settings_repo.set("keyboard_shortcuts", json.dumps(DEFAULT_KEYBOARD_SHORTCUTS))
+            st.success("Shortcuts reset to defaults! Rerunning...")
+            st.rerun()
