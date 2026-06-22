@@ -1,0 +1,84 @@
+@import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
+
+/* Theme variables applied to root and key elements */
+:root, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stSidebar"] {
+    --primary-color: $primary !important;
+    --background-color: $bg !important;
+    --secondary-background-color: $sec_bg !important;
+    --text-color: $text !important;
+    
+    /* Streamlit specific variables to trigger theme colors on elements */
+    --st-color-background: $bg !important;
+    --st-color-background-secondary: $sec_bg !important;
+    --st-color-text: $text !important;
+    --st-color-primary: $primary !important;
+
+    /* Shadcn style custom properties mapped to the active theme */
+    --background: $bg !important;
+    --foreground: $text !important;
+    --card: $sec_bg !important;
+    --card-foreground: $text !important;
+    --popover: $sec_bg !important;
+    --popover-foreground: $text !important;
+    --primary: $primary !important;
+    --primary-foreground: $bg !important;
+    --secondary: $sec_bg !important;
+    --secondary-foreground: $text !important;
+    --muted: $sec_bg !important;
+    --muted-foreground: $text !important;
+    --accent: $sec_bg !important;
+    --accent-foreground: $primary !important;
+    --destructive: oklch(0.704 0.191 22.216) !important;
+    --border: $border !important;
+    --input: $border !important;
+    --ring: $primary !important;
+    --radius: 0.65rem !important;
+}
+
+/* Core layout and app container backgrounds */
+.stApp {
+    background-color: $bg !important;
+    color: $text !important;
+}
+[data-testid="stAppViewContainer"] {
+    background-color: $bg !important;
+    color: $text !important;
+}
+[data-testid="stHeader"] {
+    background-color: $bg !important;
+}
+[data-testid="stSidebar"] {
+    background-color: $sec_bg !important;
+    border-right: 1px solid $border !important;
+}
+
+/* Sidebar elements overrides */
+[data-testid="stSidebar"] .stMarkdown p,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3,
+[data-testid="stSidebar"] label {
+    color: $text !important;
+}
+
+/* Main page and global text overrides for light base theme compatibility */
+.stApp p,
+.stApp h1,
+.stApp h2,
+.stApp h3,
+.stApp h4,
+.stApp h5,
+.stApp h6,
+.stApp label,
+.stApp li,
+.stApp a,
+.stApp summary,
+.stApp small {
+    color: $text !important;
+}
+
+/* Global Segoe UI Font override */
+html, body, p, li, h1, h2, h3, h4, label, input, select, textarea, button, .snippet-title, .snippet-desc {
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
+}

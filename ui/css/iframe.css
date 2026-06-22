@@ -1,0 +1,14 @@
+/* Collapse the layout container of the shortcut iframe to prevent empty spacing at the bottom */
+div.element-container:has(> iframe),
+div.element-container:has(> [data-testid="stIFrame"]),
+div[data-testid="stIFrame"] {
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+}

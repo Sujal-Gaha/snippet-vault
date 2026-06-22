@@ -1,0 +1,91 @@
+/* Streamlit primary/secondary buttons */
+button[kind="primary"],
+[data-testid="stPopoverBody"] button[kind="primary"] {
+    background-color: $primary !important;
+    border: none !important;
+}
+button[kind="primary"],
+button[kind="primary"] *,
+[data-testid="stPopoverBody"] button[kind="primary"],
+[data-testid="stPopoverBody"] button[kind="primary"] * {
+    color: $bg !important;
+}
+button[kind="primary"]:hover {
+    opacity: 0.9 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+button[kind="primary"]:hover * {
+    opacity: 0.9 !important;
+}
+
+button[kind="secondary"] {
+    background-color: $sec_bg !important;
+    border: 1px solid $border !important;
+}
+button[kind="secondary"],
+button[kind="secondary"] * {
+    color: $text !important;
+}
+button[kind="secondary"]:hover {
+    border-color: $primary !important;
+    background-color: $bg !important;
+}
+button[kind="secondary"]:hover * {
+    color: $primary !important;
+}
+
+/* Popovers background adjustment */
+div[data-testid="stPopoverBody"] {
+    background-color: $sec_bg !important;
+    border: 1px solid $border !important;
+}
+div[data-testid="stPopoverBody"] * {
+    color: $text !important;
+}
+
+/* Style the st.popover trigger buttons to look like a clean, borderless menu icon */
+div[data-testid="stPopover"] button {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 6px 12px !important;
+    margin: 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    color: $text !important;
+    cursor: pointer !important;
+    transition: color 0.15s ease, background-color 0.15s ease !important;
+}
+
+div[data-testid="stPopover"] button:hover,
+div[data-testid="stPopover"] button:active,
+div[data-testid="stPopover"] button:focus {
+    color: $primary !important;
+    background-color: rgba(128, 128, 128, 0.15) !important;
+    border-radius: 50% !important;
+    outline: none !important;
+}
+
+/* Hide the chevron arrow inside the st.popover trigger button */
+div[data-testid="stPopover"] button svg,
+div[data-testid="stPopover"] button span[data-testid="stIcon"],
+div[data-testid="stPopover"] button div[class*="chevron"],
+div[data-testid="stPopover"] button svg[class*="chevron"],
+div[data-testid="stPopover"] button > *:not(:first-child),
+div[data-testid="stPopover"] button * > *:not(:first-child) {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Disable pseudo-elements representing icons */
+div[data-testid="stPopover"] button::after,
+div[data-testid="stPopover"] button::before,
+div[data-testid="stPopover"] button *::after,
+div[data-testid="stPopover"] button *::before {
+    content: none !important;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}

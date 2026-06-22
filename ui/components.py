@@ -5,13 +5,75 @@ from db.models import Snippet
 from ui.dialogs import view_snippet_dialog
 from utils.helpers import truncate_desc, format_date
 
+
 class SnippetUIRenderer:
     """Handles rendering of snippet layouts (Lists, Grids) and interactive sub-elements."""
 
     def __init__(self, repository: BaseSnippetRepository):
         self.repository = repository
 
-    def render_list(self, snippets, unique_cats):
+    def _render_badge(self, label: str, badge_type: str, custom_style: str = "") -> str:
+        """Reusable HTML component for rendering badges."""
+        escaped_label = html.escape(label)
+        if badge_type == "code":
+            return f'<span class="type-badge-code" style="{custom_style}">{escaped_label}</span>'
+        elif badge_type == "command":
+            return f'<span class="type-badge-command" style="{custom_style}">{escaped_label}</span>'
+        elif badge_type == "category":
+            return f'<span class="category-badge" style="{custom_style}">{escaped_label}</span>'
+        elif badge_type == "tag":
+            return f'<span class="tag-badge" style="{custom_style}">#{escaped_label}</span>'
+        return escaped_label
+
+    def _render_tags_row(self, tags: list[str]) -> None:
+        """Reusable UI component for rendering the tags section."""
+        if not tags:
+            return
+        tag_badges = "".join([self._render_badge(tag, "tag") for tag in tags])
+        st.markdown(
+            f'<div class="tag-container">{tag_badges}</div>',
+            unsafe_allow_html=True,
+        )
+
+    def _render_snippet_header_html(self, snippet: Snippet) -> str:
+        """Reusable HTML component for snippet metadata header in List View."""
+        badge_type = "code" if snippet.type == "Code" else "command"
+        badge_html = self._render_badge(snippet.type, badge_type)
+        cat_html = self._render_badge(snippet.category, "category")
+        escaped_title = html.escape(snippet.title)
+        date_str = format_date(snippet.created_at)
+
+        return (
+            f"<div>"
+            f'<span class="snippet-title">{escaped_title}</span>'
+            f"<br />"
+            f"{badge_html}"
+            f"{cat_html}"
+            f"</div>"
+            f'<div style="color: var(--text-color); opacity: 0.65; font-size: 0.85rem; margin-top: 6px; margin-bottom: 12px;">'
+            f"Added on {date_str}</div>"
+        )
+
+    def _render_grid_header_html(self, snippet: Snippet) -> str:
+        """Reusable HTML component for snippet metadata header in Grid View."""
+        badge_type = "code" if snippet.type == "Code" else "command"
+        badge_html = self._render_badge(
+            snippet.type, badge_type, "font-size: 0.7rem; padding: 2px 6px;"
+        )
+        cat_html = self._render_badge(
+            snippet.category, "category", "font-size: 0.7rem; padding: 2px 6px;"
+        )
+        escaped_title = html.escape(snippet.title)
+
+        return (
+            f'<div style="min-height: 80px;">'
+            f"{badge_html}"
+            f"{cat_html}"
+            f'<div class="snippet-title" style="font-size: 1.1rem; margin-top: 6px;">{escaped_title}</div>'
+            f"</div>"
+        )
+
+    def render_list(self, snippets: list[Snippet], unique_cats: list[str]) -> None:
         """Renders the full details snippet list inside themed container cards."""
         for s in snippets:
             with st.container(border=True):
@@ -19,24 +81,8 @@ class SnippetUIRenderer:
                 header_col1, header_col2 = st.columns([8.8, 1.2])
 
                 with header_col1:
-                    badge_class = (
-                        "type-badge-code" if s.type == "Code" else "type-badge-command"
-                    )
-                    date_str = format_date(s.created_at)
-                    escaped_type = html.escape(s.type)
-                    escaped_category = html.escape(s.category)
-                    escaped_title = html.escape(s.title)
-                    st.markdown(
-                        f"<div>"
-                        f'<span class="snippet-title">{escaped_title}</span>'
-                        f"<br />"
-                        f'<span class="{badge_class}">{escaped_type}</span>'
-                        f'<span class="category-badge">{escaped_category}</span>'
-                        f"</div>"
-                        f'<div style="color: var(--text-color); opacity: 0.65; font-size: 0.85rem; margin-top: 6px; margin-bottom: 12px;">'
-                        f"Added on {date_str}</div>",
-                        unsafe_allow_html=True,
-                    )
+                    header_html = self._render_snippet_header_html(s)
+                    st.markdown(header_html, unsafe_allow_html=True)
 
                 with header_col2:
                     self.render_options_popover(s, unique_cats)
@@ -50,19 +96,9 @@ class SnippetUIRenderer:
                 st.code(s.content, language=lang)
 
                 # Tags Row
-                if s.tags:
-                    tag_badges = "".join(
-                        [
-                            f'<span class="tag-badge">#{html.escape(tag)}</span>'
-                            for tag in s.tags
-                        ]
-                    )
-                    st.markdown(
-                        f'<div class="tag-container">{tag_badges}</div>',
-                        unsafe_allow_html=True,
-                    )
+                self._render_tags_row(s.tags)
 
-    def render_grid(self, snippets, unique_cats):
+    def render_grid(self, snippets: list[Snippet], unique_cats: list[str]) -> None:
         """Renders the compact grid snippet cards (2 columns) inside themed container cards."""
         N = 2
         cols = st.columns(N)
@@ -71,20 +107,8 @@ class SnippetUIRenderer:
             with col:
                 with st.container(border=True):
                     # Title & Badges
-                    badge_class = (
-                        "type-badge-code" if s.type == "Code" else "type-badge-command"
-                    )
-                    escaped_type = html.escape(s.type)
-                    escaped_category = html.escape(s.category)
-                    escaped_title = html.escape(s.title)
-                    st.markdown(
-                        f'<div style="min-height: 80px;">'
-                        f'<span class="{badge_class}" style="font-size: 0.7rem; padding: 2px 6px;">{escaped_type}</span>'
-                        f'<span class="category-badge" style="font-size: 0.7rem; padding: 2px 6px;">{escaped_category}</span>'
-                        f'<div class="snippet-title" style="font-size: 1.1rem; margin-top: 6px;">{escaped_title}</div>'
-                        f"</div>",
-                        unsafe_allow_html=True,
-                    )
+                    header_html = self._render_grid_header_html(s)
+                    st.markdown(header_html, unsafe_allow_html=True)
 
                     # Description (truncated)
                     desc_truncated = truncate_desc(s.description)
@@ -110,7 +134,9 @@ class SnippetUIRenderer:
                     with btn_col2:
                         self.render_options_popover(s, unique_cats, is_compact=True)
 
-    def render_options_popover(self, snippet: Snippet, unique_cats, is_compact=False):
+    def render_options_popover(
+        self, snippet: Snippet, unique_cats: list[str], is_compact: bool = False
+    ) -> None:
         """Renders the settings popover menu for re-categorization and deletion."""
         prefix = "comp_" if is_compact else ""
         with st.popover(

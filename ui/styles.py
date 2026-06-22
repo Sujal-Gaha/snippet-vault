@@ -7,24 +7,42 @@ DEFAULT_THEMES = {
         "background": "#2e3440",
         "secondary_background": "#3b4252",
         "text": "#eceff4",
+        "border": "rgba(255, 255, 255, 0.15)",
     },
-    "Rose Theme": {
-        "primary": "#ebbcba",
-        "background": "#191724",
-        "secondary_background": "#26233a",
-        "text": "#e0def4",
+    "Nordic Light": {
+        "primary": "#5e81ac",
+        "background": "#eceff4",
+        "secondary_background": "#e5e9f0",
+        "text": "#2e3440",
+        "border": "#4c566a",
+    },
+    "Rose Dark": {
+        "primary": "oklch(0.637 0.237 25.331)",
+        "background": "oklch(0.141 0.005 285.823)",
+        "secondary_background": "oklch(0.21 0.006 285.885)",
+        "text": "oklch(0.985 0 0)",
+        "border": "rgba(255, 255, 255, 0.12)",
+    },
+    "Rose Light": {
+        "primary": "oklch(0.637 0.237 25.331)",
+        "background": "oklch(1 0 0)",
+        "secondary_background": "oklch(0.967 0.001 286.375)",
+        "text": "oklch(0.141 0.005 285.823)",
+        "border": "#6e6578",
     },
     "Catppuccin Mocha": {
         "primary": "#cba6f7",
         "background": "#1e1e2e",
         "secondary_background": "#313244",
         "text": "#cdd6f4",
+        "border": "rgba(255, 255, 255, 0.1)",
     },
-    "Shadcn Default": {
+    "Shadcn": {
         "primary": "#ffffff",
         "background": "#09090b",
         "secondary_background": "#18181b",
         "text": "#fafafa",
+        "border": "rgba(255, 255, 255, 0.15)",
     },
 }
 
@@ -66,349 +84,48 @@ def inject_custom_styles(settings_repo):
     bg = theme_colors.get("background", "#2e3440")
     sec_bg = theme_colors.get("secondary_background", "#3b4252")
     text = theme_colors.get("text", "#eceff4")
+    border = theme_colors.get("border", f"color-mix(in srgb, {text} 18%, transparent)")
+
+    import os
+    from string import Template
+
+    # Load and render modular CSS templates
+    css_files = [
+        "base.css",
+        "card.css",
+        "button.css",
+        "input.css",
+        "dialog.css",
+        "svg.css",
+        "iframe.css",
+    ]
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    css_dir = os.path.join(current_dir, "css")
+
+    compiled_css = []
+    mapping = {
+        "primary": primary,
+        "bg": bg,
+        "sec_bg": sec_bg,
+        "text": text,
+        "border": border,
+    }
+
+    for filename in css_files:
+        filepath = os.path.join(css_dir, filename)
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                template_str = f.read()
+                # Use Template class to safely replace placeholder tags like $primary, $bg
+                t = Template(template_str)
+                compiled_css.append(t.substitute(mapping))
+        except Exception as e:
+            print(f"Error loading CSS file {filename}: {e}")
+
+    joined_css = "\n".join(compiled_css)
 
     st.html(f"""
     <style>
-        @import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
-
-        /* Theme variables applied to root and key elements */
-        :root, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stSidebar"] {{
-            --primary-color: {primary} !important;
-            --background-color: {bg} !important;
-            --secondary-background-color: {sec_bg} !important;
-            --text-color: {text} !important;
-            
-            /* Streamlit specific variables to trigger theme colors on elements */
-            --st-color-background: {bg} !important;
-            --st-color-background-secondary: {sec_bg} !important;
-            --st-color-text: {text} !important;
-            --st-color-primary: {primary} !important;
-        }}
-        
-        /* Core layout and app container backgrounds */
-        .stApp {{
-            background-color: {bg} !important;
-            color: {text} !important;
-        }}
-        [data-testid="stAppViewContainer"] {{
-            background-color: {bg} !important;
-            color: {text} !important;
-        }}
-        [data-testid="stHeader"] {{
-            background-color: {bg} !important;
-        }}
-        [data-testid="stSidebar"] {{
-            background-color: {sec_bg} !important;
-            border-right: 1px solid rgba(128, 128, 128, 0.1) !important;
-        }}
-        
-        /* Sidebar elements overrides */
-        [data-testid="stSidebar"] .stMarkdown p,
-        [data-testid="stSidebar"] span,
-        [data-testid="stSidebar"] h1,
-        [data-testid="stSidebar"] h2,
-        [data-testid="stSidebar"] h3,
-        [data-testid="stSidebar"] label {{
-            color: {text} !important;
-        }}
-
-        /* Input fields and dropdown select components */
-        div[data-baseweb="select"] > div, 
-        div[data-baseweb="input"] > div,
-        div[data-baseweb="base-input"] > input,
-        textarea,
-        input {{
-            background-color: {bg} !important;
-            color: {text} !important;
-            border-color: rgba(128, 128, 128, 0.2) !important;
-        }}
-        
-        div[data-baseweb="select"] > div:hover, 
-        div[data-baseweb="input"] > div:hover,
-        textarea:hover,
-        input:hover {{
-            border-color: {primary} !important;
-        }}
-        
-        /* Streamlit primary/secondary buttons */
-        button[kind="primary"],
-        [data-testid="stPopoverBody"] button[kind="primary"] {{
-            background-color: {primary} !important;
-            border: none !important;
-        }}
-        button[kind="primary"],
-        button[kind="primary"] *,
-        [data-testid="stPopoverBody"] button[kind="primary"],
-        [data-testid="stPopoverBody"] button[kind="primary"] * {{
-            color: {bg} !important;
-        }}
-        button[kind="primary"]:hover {{
-            opacity: 0.9 !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-        }}
-        button[kind="primary"]:hover * {{
-            opacity: 0.9 !important;
-        }}
-        
-        button[kind="secondary"] {{
-            background-color: {sec_bg} !important;
-            border: 1px solid rgba(128, 128, 128, 0.3) !important;
-        }}
-        button[kind="secondary"],
-        button[kind="secondary"] * {{
-            color: {text} !important;
-        }}
-        button[kind="secondary"]:hover {{
-            border-color: {primary} !important;
-            background-color: {bg} !important;
-        }}
-        button[kind="secondary"]:hover * {{
-            color: {primary} !important;
-        }}
-        
-        /* Popovers background adjustment */
-        div[data-testid="stPopoverBody"] {{
-            background-color: {sec_bg} !important;
-            border: 1px solid rgba(128, 128, 128, 0.2) !important;
-        }}
-        div[data-testid="stPopoverBody"] * {{
-            color: {text} !important;
-        }}
-        
-        /* Style the st.popover trigger buttons to look like a clean, borderless menu icon */
-        div[data-testid="stPopover"] button {{
-            background-color: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 6px 12px !important;
-            margin: 0 !important;
-            width: auto !important;
-            min-width: 0 !important;
-            min-height: 0 !important;
-            color: {text} !important;
-            cursor: pointer !important;
-            transition: color 0.15s ease, background-color 0.15s ease !important;
-        }}
-        
-        div[data-testid="stPopover"] button:hover,
-        div[data-testid="stPopover"] button:active,
-        div[data-testid="stPopover"] button:focus {{
-            color: {primary} !important;
-            background-color: rgba(128, 128, 128, 0.15) !important;
-            border-radius: 50% !important;
-            outline: none !important;
-        }}
-        
-        /* Hide the chevron arrow inside the st.popover trigger button */
-        div[data-testid="stPopover"] button svg,
-        div[data-testid="stPopover"] button span[data-testid="stIcon"],
-        div[data-testid="stPopover"] button div[class*="chevron"],
-        div[data-testid="stPopover"] button svg[class*="chevron"],
-        div[data-testid="stPopover"] button > *:not(:first-child),
-        div[data-testid="stPopover"] button * > *:not(:first-child) {{
-            display: none !important;
-            width: 0 !important;
-            height: 0 !important;
-        }}
-        
-        /* Disable pseudo-elements representing icons */
-        div[data-testid="stPopover"] button::after,
-        div[data-testid="stPopover"] button::before,
-        div[data-testid="stPopover"] button *::after,
-        div[data-testid="stPopover"] button *::before {{
-            content: none !important;
-            display: none !important;
-            width: 0 !important;
-            height: 0 !important;
-        }}
-        
-        /* BaseWeb and Streamlit virtualized selectbox dropdown list styles (rendered outside .stApp via React portals) */
-        div[data-baseweb="popover"],
-        div[data-baseweb="popover"] > div,
-        div[data-baseweb="menu"],
-        div[data-baseweb="menu"] > div,
-        ul[role="listbox"],
-        ul[role="listbox"] div,
-        div[data-testid="stVirtualDropdown"],
-        div[data-testid="stVirtualDropdown"] > div,
-        [data-testid="stVirtualDropdown"] {{
-            background-color: {sec_bg} !important;
-            border-color: rgba(128, 128, 128, 0.2) !important;
-        }}
-        div[data-baseweb="popover"] ul,
-        div[data-baseweb="menu"] ul,
-        div[data-testid="stVirtualDropdown"] ul {{
-            background-color: {sec_bg} !important;
-        }}
-        div[data-baseweb="popover"] ul *,
-        div[data-baseweb="menu"] *,
-        div[data-testid="stVirtualDropdown"] *,
-        [data-testid="stVirtualDropdown"] * {{
-            background-color: transparent !important;
-            color: {text} !important;
-        }}
-        
-        /* Global Listbox & Option styling overrides (selectbox dropdown items and nested wrappers) */
-        [role="listbox"],
-        [role="listbox"] *,
-        [role="option"],
-        [role="option"] *,
-        [role="option"] > div,
-        [role="option"] > span,
-        div[data-baseweb="popover"] li,
-        div[data-baseweb="menu"] li,
-        li[role="option"],
-        div[role="option"],
-        [data-testid="stVirtualDropdown"] div[role="option"] {{
-            background-color: {sec_bg} !important;
-            color: {text} !important;
-            transition: background-color 0.1s ease !important;
-        }}
-        
-        /* Highlighted/Hovered states for options and all descendants (forcing colors to Mauve and Base background) */
-        [role="option"]:hover,
-        [role="option"]:hover *,
-        [role="option"][aria-selected="true"],
-        [role="option"][aria-selected="true"] *,
-        [role="option"][data-highlighted="true"],
-        [role="option"][data-highlighted="true"] *,
-        [data-active="true"],
-        [data-active="true"] *,
-        li[role="option"]:hover,
-        li[role="option"]:hover *,
-        div[role="option"]:hover,
-        div[role="option"]:hover *,
-        div[data-baseweb="popover"] li:hover,
-        div[data-baseweb="popover"] li:hover *,
-        div[data-baseweb="popover"] li[aria-selected="true"],
-        div[data-baseweb="popover"] li[aria-selected="true"] *,
-        div[data-baseweb="popover"] li[data-highlighted="true"],
-        div[data-baseweb="popover"] li[data-highlighted="true"] *,
-        div[data-baseweb="menu"] li:hover,
-        div[data-baseweb="menu"] li:hover *,
-        [data-testid="stVirtualDropdown"] div[role="option"]:hover,
-        [data-testid="stVirtualDropdown"] div[role="option"]:hover *,
-        [data-testid="stVirtualDropdown"] [data-active="true"],
-        [data-testid="stVirtualDropdown"] [data-active="true"] * {{
-            background-color: {primary} !important;
-            color: {bg} !important;
-        }}
-        
-        /* Metric widget styling */
-        [data-testid="stMetricValue"] {{
-            color: {primary} !important;
-        }}
-        [data-testid="stMetricLabel"] {{
-            color: {text} !important;
-            opacity: 0.8;
-        }}
-
-        /* Global Segoe UI Font override (targeting text elements and controls while protecting icons) */
-        html, body, p, li, h1, h2, h3, h4, label, input, select, textarea, button, .snippet-title, .snippet-desc {{
-            font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
-        }}
-        
-        /* Card design for snippet blocks (including Streamlit's native st.container with border) */
-        .snippet-card,
-        div[data-testid="stVerticalBlockBorderWrapper"],
-        [data-testid="stVerticalBlockBorderWrapper"] {{
-            background-color: {sec_bg} !important;
-            border-radius: 12px !important;
-            padding: 24px !important;
-            margin-bottom: 24px !important;
-            border: 1px solid rgba(128, 128, 128, 0.2) !important;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03) !important;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
-        }}
-        .snippet-card:hover,
-        div[data-testid="stVerticalBlockBorderWrapper"]:hover,
-        [data-testid="stVerticalBlockBorderWrapper"]:hover {{
-            transform: translateY(-2px) !important;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08) !important;
-            border-color: {primary} !important;
-        }}
-        .snippet-title {{
-            color: {primary};
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }}
-        .snippet-card p, .snippet-card li, .snippet-card h1, .snippet-card h2, .snippet-card h3, .snippet-card h4,
-        [data-testid="stVerticalBlockBorderWrapper"] p,
-        [data-testid="stVerticalBlockBorderWrapper"] li,
-        [data-testid="stVerticalBlockBorderWrapper"] h1,
-        [data-testid="stVerticalBlockBorderWrapper"] h2,
-        [data-testid="stVerticalBlockBorderWrapper"] h3,
-        [data-testid="stVerticalBlockBorderWrapper"] h4 {{
-            color: {text} !important;
-            line-height: 1.6;
-        }}
-        /* Tags styling */
-        .tag-container {{
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 15px;
-        }}
-        .tag-badge {{
-            background-color: {bg};
-            color: {text};
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            border: 1px solid rgba(128, 128, 128, 0.2);
-        }}
-        .type-badge-code {{
-            background-color: {primary}dd; /* theme primary with some transparency */
-            color: {bg};
-            padding: 1px 6px;
-            border-radius: 3px;
-            font-size: 0.6rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-right: 12px;
-            display: inline-block;
-            vertical-align: middle;
-        }}
-        .type-badge-command {{
-            background-color: #bf616a;
-            color: #eceff4;
-            padding: 1px 6px;
-            border-radius: 3px;
-            font-size: 0.6rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-right: 12px;
-            display: inline-block;
-            vertical-align: middle;
-        }}
-        .category-badge {{
-            background-color: {bg};
-            color: {primary};
-            padding: 1px 6px;
-            border-radius: 3px;
-            font-size: 0.6rem;
-            font-weight: bold;
-            border: 1px solid rgba(128, 128, 128, 0.2);
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 12px;
-        }}
-        
-        /* Collapse the layout container of the shortcut iframe to prevent empty spacing at the bottom */
-        div.element-container:has(> iframe),
-        div.element-container:has(> [data-testid="stIFrame"]),
-        div[data-testid="stIFrame"] {{
-            height: 0 !important;
-            min-height: 0 !important;
-            max-height: 0 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            overflow: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-            position: absolute !important;
-        }}
+{joined_css}
     </style>
     """)
