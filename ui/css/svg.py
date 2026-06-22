@@ -11,9 +11,9 @@ div[role="dialog"] button svg,
 div[data-testid="stDialog"] button svg,
 [role="option"] svg,
 li[role="option"] svg {
-    fill: $clr_text !important;
-    stroke: $clr_text !important;
-    color: $clr_text !important;
+    fill: var(--foreground) !important;
+    stroke: var(--foreground) !important;
+    color: var(--foreground) !important;
 }
 
 /* Ensure hovered option SVGs receive background/inverse color */
@@ -21,8 +21,8 @@ li[role="option"] svg {
 [role="option"][aria-selected="true"] svg,
 [role="option"][data-highlighted="true"] svg,
 [data-active="true"] svg {
-    fill: $clr_bg !important;
-    stroke: $clr_bg !important;
-    color: $clr_bg !important;
+    fill: var(--primary-foreground) !important;
+    stroke: var(--primary-foreground) !important;
+    color: var(--primary-foreground) !important;
 }
 """

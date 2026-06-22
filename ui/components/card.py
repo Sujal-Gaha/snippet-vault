@@ -5,6 +5,7 @@ from utils.helpers import truncate_desc, format_date
 from ui.components.badge import render_badge
 from ui.components.button import render_button
 
+
 def _render_tags_row(tags: list[str]) -> None:
     """Reusable UI component for rendering the tags section."""
     if not tags:
@@ -14,6 +15,7 @@ def _render_tags_row(tags: list[str]) -> None:
         f'<div class="tag-container">{tag_badges}</div>',
         unsafe_allow_html=True,
     )
+
 
 def _render_snippet_header_html(snippet: Snippet) -> str:
     """Reusable HTML component for snippet metadata header in List View."""
@@ -34,6 +36,7 @@ def _render_snippet_header_html(snippet: Snippet) -> str:
         f"Added on {date_str}</div>"
     )
 
+
 def _render_grid_header_html(snippet: Snippet) -> str:
     """Reusable HTML component for snippet metadata header in Grid View."""
     badge_type = "code" if snippet.type == "Code" else "command"
@@ -53,7 +56,10 @@ def _render_grid_header_html(snippet: Snippet) -> str:
         f"</div>"
     )
 
-def render_list_card(snippet: Snippet, unique_cats: list[str], render_options_popover_fn) -> None:
+
+def render_list_card(
+    snippet: Snippet, unique_cats: list[str], render_options_popover_fn
+) -> None:
     """Renders a single detailed list card container."""
     with st.container(border=True):
         # Header Row (Title, Type, Category, Options)
@@ -77,7 +83,10 @@ def render_list_card(snippet: Snippet, unique_cats: list[str], render_options_po
         # Tags Row
         _render_tags_row(snippet.tags)
 
-def render_grid_card(snippet: Snippet, unique_cats: list[str], render_options_popover_fn) -> None:
+
+def render_grid_card(
+    snippet: Snippet, unique_cats: list[str], render_options_popover_fn
+) -> None:
     """Renders a single compact grid card container."""
     with st.container(border=True):
         # Title & Badges
@@ -105,6 +114,7 @@ def render_grid_card(snippet: Snippet, unique_cats: list[str], render_options_po
                 "View", key=f"comp_view_{snippet.id}", use_container_width=True
             ):
                 from ui.components.dialogs import view_snippet_dialog
+
                 view_snippet_dialog(snippet)
         with btn_col2:
             render_options_popover_fn(snippet, unique_cats, is_compact=True)

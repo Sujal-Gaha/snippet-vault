@@ -1,46 +1,53 @@
 BUTTON_CSS = """/* Streamlit primary/secondary buttons */
 button[kind="primary"],
 [data-testid="stPopoverBody"] button[kind="primary"] {
-    background-color: $clr_primary !important;
-    border: none !important;
+    background-color: var(--primary) !important;
+    border: var(--border-width) solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow-sm) !important;
 }
 button[kind="primary"],
 button[kind="primary"] *,
 [data-testid="stPopoverBody"] button[kind="primary"],
 [data-testid="stPopoverBody"] button[kind="primary"] * {
-    color: $clr_bg !important;
+    color: var(--primary-foreground) !important;
 }
 button[kind="primary"]:hover {
     opacity: 0.9 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    box-shadow: var(--shadow-md) !important;
 }
 button[kind="primary"]:hover * {
     opacity: 0.9 !important;
 }
 
 button[kind="secondary"] {
-    background-color: $clr_sec_bg !important;
-    border: 1px solid $clr_border !important;
+    background-color: var(--secondary) !important;
+    border: var(--border-width) solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow-2xs) !important;
 }
 button[kind="secondary"],
 button[kind="secondary"] * {
-    color: $clr_text !important;
+    color: var(--secondary-foreground) !important;
 }
 button[kind="secondary"]:hover {
-    border-color: $clr_primary !important;
-    background-color: $clr_bg !important;
+    border-color: var(--primary) !important;
+    background-color: var(--primary) !important;
+    box-shadow: var(--shadow-sm) !important;
 }
 button[kind="secondary"]:hover * {
-    color: $clr_primary !important;
+    color: var(--primary-foreground) !important;
 }
 
 /* Popovers background adjustment */
 div[data-testid="stPopoverBody"] {
-    background-color: $clr_sec_bg !important;
-    border: 1px solid $clr_border !important;
+    background-color: var(--popover) !important;
+    border: var(--border-width) solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow-md) !important;
 }
 div[data-testid="stPopoverBody"] * {
-    color: $clr_text !important;
+    color: var(--popover-foreground) !important;
 }
 
 /* Style the st.popover trigger buttons to look like a clean, borderless menu icon */
@@ -53,7 +60,7 @@ div[data-testid="stPopover"] button {
     width: auto !important;
     min-width: 0 !important;
     min-height: 0 !important;
-    color: $clr_text !important;
+    color: var(--foreground) !important;
     cursor: pointer !important;
     transition: color 0.15s ease, background-color 0.15s ease !important;
 }
@@ -61,7 +68,7 @@ div[data-testid="stPopover"] button {
 div[data-testid="stPopover"] button:hover,
 div[data-testid="stPopover"] button:active,
 div[data-testid="stPopover"] button:focus {
-    color: $clr_primary !important;
+    color: var(--primary) !important;
     background-color: rgba(128, 128, 128, 0.15) !important;
     border-radius: 50% !important;
     outline: none !important;

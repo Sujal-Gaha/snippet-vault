@@ -2,9 +2,11 @@ DIALOG_CSS = """/* Dialog modal styling overrides */
 div[role="dialog"],
 [data-testid="stDialog"] > div,
 div[data-testid="stDialog"] {
-    background-color: $clr_sec_bg !important;
-    color: $clr_text !important;
-    border: 1px solid $clr_border !important;
+    background-color: var(--popover) !important;
+    color: var(--popover-foreground) !important;
+    border: var(--border-width) solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow-xl) !important;
 }
 div[role="dialog"] h1,
 div[role="dialog"] h2,
@@ -15,23 +17,23 @@ div[role="dialog"] h6,
 div[role="dialog"] p,
 div[role="dialog"] label,
 div[role="dialog"] span {
-    color: $clr_text !important;
+    color: var(--popover-foreground) !important;
 }
 
 /* Tab titles styling */
 div[data-testid="stTabBar"] button p {
-    color: $clr_text !important;
+    color: var(--foreground) !important;
 }
 div[data-testid="stTabBar"] button[aria-selected="true"] p {
-    color: $clr_primary !important;
+    color: var(--primary) !important;
 }
 
 /* Metric widget styling */
 [data-testid="stMetricValue"] {
-    color: $clr_primary !important;
+    color: var(--primary) !important;
 }
 [data-testid="stMetricLabel"] {
-    color: $clr_text !important;
+    color: var(--foreground) !important;
     opacity: 0.8;
 }
 """

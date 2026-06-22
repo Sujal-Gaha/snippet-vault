@@ -6,15 +6,15 @@ div.stElementContainer div[data-testid="stVerticalBlock"]:has(.snippet-title),
 div.stElementContainer div[data-testid="stVerticalBlock"]:has(.snippet-card),
 div.stElementContainer div[data-testid="stVerticalBlock"]:has([data-testid="stCodeBlock"]),
 div.stElementContainer div[data-testid="stVerticalBlock"]:has(.tag-container) {
-    background-color: $clr_sec_bg !important;
-    border-radius: 12px !important;
+    background-color: var(--card) !important;
+    border-radius: var(--radius-lg, var(--radius)) !important;
     padding: 24px !important;
     margin-bottom: 24px !important;
-    border: 1px solid $clr_border !important;
+    border: var(--border-width) solid var(--border) !important;
     border-style: solid !important;
-    border-width: 1px !important;
-    border-color: $clr_border !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03) !important;
+    border-width: var(--border-width) !important;
+    border-color: var(--border) !important;
+    box-shadow: var(--shadow) !important;
     transition: border-color 0.15s ease !important;
 }
 
@@ -25,14 +25,13 @@ div.stElementContainer div[data-testid="stVerticalBlock"]:has(.snippet-title):ho
 div.stElementContainer div[data-testid="stVerticalBlock"]:has(.snippet-card):hover,
 div.stElementContainer div[data-testid="stVerticalBlock"]:has([data-testid="stCodeBlock"]):hover,
 div.stElementContainer div[data-testid="stVerticalBlock"]:has(.tag-container):hover {
-    border-color: $clr_primary !important;
+    border-color: var(--primary) !important;
 }
 
 .snippet-title {
-    color: $clr_primary !important;
+    color: var(--primary) !important;
     font-size: 1.4rem;
     font-weight: 600;
-    margin-bottom: 5px;
     display: inline-block;
 }
 
@@ -41,6 +40,6 @@ div.stElementContainer div[data-testid="stVerticalBlock"]:has(.tag-container):ho
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 15px;
+    margin-bottom: 16px;
 }
 """

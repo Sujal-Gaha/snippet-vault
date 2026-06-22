@@ -13,43 +13,79 @@ BASE_CSS = """@import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
     --st-color-text: $clr_text !important;
     --st-color-primary: $clr_primary !important;
 
-    /* Shadcn style custom properties mapped to the active theme */
-    --background: $clr_bg !important;
-    --foreground: $clr_text !important;
-    --card: $clr_sec_bg !important;
-    --card-foreground: $clr_text !important;
-    --popover: $clr_sec_bg !important;
-    --popover-foreground: $clr_text !important;
+    /* Shadcn/Tailwind style custom properties mapped to the active theme */
+    --background: $background !important;
+    --foreground: $foreground !important;
+    --card: $card !important;
+    --card-foreground: $card_foreground !important;
+    --popover: $popover !important;
+    --popover-foreground: $popover_foreground !important;
     --primary: $clr_primary !important;
-    --primary-foreground: $clr_bg !important;
-    --secondary: $clr_sec_bg !important;
-    --secondary-foreground: $clr_text !important;
-    --muted: $clr_sec_bg !important;
-    --muted-foreground: $clr_text !important;
-    --accent: $clr_sec_bg !important;
-    --accent-foreground: $clr_primary !important;
-    --destructive: oklch(0.704 0.191 22.216) !important;
+    --primary-foreground: $primary_foreground !important;
+    --secondary: $secondary !important;
+    --secondary-foreground: $secondary_foreground !important;
+    --muted: $muted !important;
+    --muted-foreground: $muted_foreground !important;
+    --accent: $accent !important;
+    --accent-foreground: $accent_foreground !important;
+    --destructive: $destructive !important;
+    --destructive-foreground: $destructive_foreground !important;
     --border: $clr_border !important;
-    --input: $clr_border !important;
-    --ring: $clr_primary !important;
-    --radius: 0.65rem !important;
+    --input: $input !important;
+    --ring: $ring !important;
+    
+    --chart-1: $chart_1 !important;
+    --chart-2: $chart_2 !important;
+    --chart-3: $chart_3 !important;
+    --chart-4: $chart_4 !important;
+    --chart-5: $chart_5 !important;
+    
+    --sidebar: $sidebar !important;
+    --sidebar-foreground: $sidebar_foreground !important;
+    --sidebar-primary: $sidebar_primary !important;
+    --sidebar-primary-foreground: $sidebar_primary_foreground !important;
+    --sidebar-accent: $sidebar_accent !important;
+    --sidebar-accent-foreground: $sidebar_accent_foreground !important;
+    --sidebar-border: $sidebar_border !important;
+    --sidebar-ring: $sidebar_ring !important;
+
+    --font-sans: $font_sans !important;
+    --font-serif: $font_serif !important;
+    --font-mono: $font_mono !important;
+
+    --radius: $radius !important;
+    --radius-sm: calc(var(--radius) - 4px) !important;
+    --radius-md: calc(var(--radius) - 2px) !important;
+    --radius-lg: var(--radius) !important;
+    --radius-xl: calc(var(--radius) + 4px) !important;
+
+    --shadow-2xs: $shadow_2xs !important;
+    --shadow-xs: $shadow_xs !important;
+    --shadow-sm: $shadow_sm !important;
+    --shadow: $shadow !important;
+    --shadow-md: $shadow_md !important;
+    --shadow-lg: $shadow_lg !important;
+    --shadow-xl: $shadow_xl !important;
+    --shadow-2xl: $shadow_2xl !important;
+    
+    --border-width: $border_width !important;
 }
 
 /* Core layout and app container backgrounds */
 .stApp {
-    background-color: $clr_bg !important;
-    color: $clr_text !important;
+    background-color: var(--background) !important;
+    color: var(--foreground) !important;
 }
 [data-testid="stAppViewContainer"] {
-    background-color: $clr_bg !important;
-    color: $clr_text !important;
+    background-color: var(--background) !important;
+    color: var(--foreground) !important;
 }
 [data-testid="stHeader"] {
-    background-color: $clr_bg !important;
+    background-color: var(--background) !important;
 }
 [data-testid="stSidebar"] {
-    background-color: $clr_sec_bg !important;
-    border-right: 1px solid $clr_border !important;
+    background-color: var(--sidebar) !important;
+    border-right: var(--border-width) solid var(--sidebar-border) !important;
 }
 
 /* Sidebar elements overrides */
@@ -59,7 +95,7 @@ BASE_CSS = """@import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
 [data-testid="stSidebar"] h2,
 [data-testid="stSidebar"] h3,
 [data-testid="stSidebar"] label {
-    color: $clr_text !important;
+    color: var(--sidebar-foreground) !important;
 }
 
 /* Main page and global text overrides for light base theme compatibility */
@@ -75,11 +111,44 @@ BASE_CSS = """@import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
 .stApp a,
 .stApp summary,
 .stApp small {
-    color: $clr_text !important;
+    color: var(--foreground) !important;
 }
 
-/* Global Segoe UI Font override */
-html, body, p, li, h1, h2, h3, h4, label, input, select, textarea, button, .snippet-title, .snippet-desc {
-    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
+/* Global Font override */
+.stApp, 
+.stApp [data-testid="stMarkdownContainer"], 
+.stApp p, 
+.stApp li, 
+.stApp a, 
+.stApp h1, 
+.stApp h2, 
+.stApp h3, 
+.stApp h4, 
+.stApp h5, 
+.stApp h6, 
+.stApp label, 
+.stApp input, 
+.stApp select, 
+.stApp textarea, 
+.stApp button[kind], 
+.stApp small, 
+.stApp summary,
+.stApp option,
+.stApp legend,
+.snippet-title,
+.snippet-desc {
+    font-family: var(--font-sans) !important;
+}
+
+/* Monospace overrides for code blocks and terminal elements */
+.stApp code, 
+.stApp pre, 
+.stApp kbd, 
+.stApp samp, 
+.stApp [data-testid="stCodeBlock"], 
+.stApp [data-testid="stCodeBlock"] *,
+.stApp pre *,
+.stApp code * {
+    font-family: var(--font-mono), monospace !important;
 }
 """

@@ -4,20 +4,21 @@ div[data-baseweb="input"] > div,
 div[data-baseweb="base-input"] > input,
 textarea,
 input {
-    background-color: $clr_bg !important;
-    color: $clr_text !important;
-    border-color: $clr_border !important;
+    background-color: var(--background) !important;
+    color: var(--foreground) !important;
+    border: var(--border-width) solid var(--border) !important;
+    border-radius: var(--radius) !important;
 }
 
 div[data-baseweb="select"] *, 
 div[data-baseweb="input"] *,
 div[data-baseweb="base-input"] * {
-    color: $clr_text !important;
+    color: var(--foreground) !important;
 }
 
 input::placeholder,
 textarea::placeholder {
-    color: $clr_text !important;
+    color: var(--foreground) !important;
     opacity: 0.5 !important;
 }
 
@@ -25,7 +26,7 @@ div[data-baseweb="select"] > div:hover,
 div[data-baseweb="input"] > div:hover,
 textarea:hover,
 input:hover {
-    border-color: $clr_primary !important;
+    border-color: var(--primary) !important;
 }
 
 /* BaseWeb and Streamlit virtualized selectbox dropdown list styles (rendered outside .stApp via React portals) */
@@ -38,20 +39,21 @@ ul[role="listbox"] div,
 div[data-testid="stVirtualDropdown"],
 div[data-testid="stVirtualDropdown"] > div,
 [data-testid="stVirtualDropdown"] {
-    background-color: $clr_sec_bg !important;
-    border-color: $clr_border !important;
+    background-color: var(--popover) !important;
+    border: var(--border-width) solid var(--border) !important;
+    border-radius: var(--radius) !important;
 }
 div[data-baseweb="popover"] ul,
 div[data-baseweb="menu"] ul,
 div[data-testid="stVirtualDropdown"] ul {
-    background-color: $clr_sec_bg !important;
+    background-color: var(--popover) !important;
 }
 div[data-baseweb="popover"] ul *,
 div[data-baseweb="menu"] *,
 div[data-testid="stVirtualDropdown"] *,
 [data-testid="stVirtualDropdown"] * {
     background-color: transparent !important;
-    color: $clr_text !important;
+    color: var(--popover-foreground) !important;
 }
 
 /* Global Listbox & Option styling overrides (selectbox dropdown items and nested wrappers) */
@@ -66,8 +68,8 @@ div[data-baseweb="menu"] li,
 li[role="option"],
 div[role="option"],
 [data-testid="stVirtualDropdown"] div[role="option"] {
-    background-color: $clr_sec_bg !important;
-    color: $clr_text !important;
+    background-color: var(--popover) !important;
+    color: var(--popover-foreground) !important;
     transition: background-color 0.1s ease !important;
 }
 
@@ -96,7 +98,7 @@ div[data-baseweb="menu"] li:hover *,
 [data-testid="stVirtualDropdown"] div[role="option"]:hover *,
 [data-testid="stVirtualDropdown"] [data-active="true"],
 [data-testid="stVirtualDropdown"] [data-active="true"] * {
-    background-color: $clr_primary !important;
-    color: $clr_bg !important;
+    background-color: var(--primary) !important;
+    color: var(--primary-foreground) !important;
 }
 """
