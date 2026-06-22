@@ -63,7 +63,7 @@ with st.sidebar:
 
     # Theme Settings configuration and management
     themes_config = load_themes_config(settings_repository)
-    selected_theme = themes_config.get("selected_theme", "Nordic Dark (Default)")
+    selected_theme = themes_config.get("selected_theme", "Nordic Dark")
 
     st.markdown("---")
     st.header("Theme Settings")

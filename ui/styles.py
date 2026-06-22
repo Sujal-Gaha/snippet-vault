@@ -44,19 +44,33 @@ DEFAULT_THEMES = {
         "text": "#fafafa",
         "border": "rgba(255, 255, 255, 0.15)",
     },
+    "Neo Brutalism Light": {
+        "primary": "oklch(0.6489 0.2370 26.9728)",
+        "background": "oklch(1.0000 0 0)",
+        "secondary_background": "oklch(0.9551 0 0)",
+        "text": "oklch(0 0 0)",
+        "border": "oklch(0 0 0)",
+    },
+    "Neo Brutalism Dark": {
+        "primary": "oklch(0.7044 0.1872 23.1858)",
+        "background": "oklch(0 0 0)",
+        "secondary_background": "oklch(0.2178 0 0)",
+        "text": "oklch(1.0000 0 0)",
+        "border": "oklch(1.0000 0 0)",
+    },
 }
 
 
 def load_themes_config(settings_repo):
     """Loads custom themes and the selected theme from the database settings."""
     try:
-        selected_theme = settings_repo.get("selected_theme", "Nordic Dark (Default)")
+        selected_theme = settings_repo.get("selected_theme", "Nordic Dark")
         custom_themes_json = settings_repo.get("custom_themes", "{}")
         custom_themes = json.loads(custom_themes_json)
         return {"selected_theme": selected_theme, "custom_themes": custom_themes}
     except Exception as e:
         print(f"Error loading themes from database: {e}")
-        return {"selected_theme": "Nordic Dark (Default)", "custom_themes": {}}
+        return {"selected_theme": "Nordic Dark", "custom_themes": {}}
 
 
 def save_themes_config(settings_repo, selected_theme, custom_themes):
@@ -70,7 +84,7 @@ def save_themes_config(settings_repo, selected_theme, custom_themes):
 
 def inject_custom_styles(settings_repo):
     config = load_themes_config(settings_repo)
-    selected_name = config.get("selected_theme", "Nordic Dark (Default)")
+    selected_name = config.get("selected_theme", "Nordic Dark")
     custom_themes = config.get("custom_themes", {})
 
     if selected_name in DEFAULT_THEMES:
@@ -78,7 +92,7 @@ def inject_custom_styles(settings_repo):
     elif selected_name in custom_themes:
         theme_colors = custom_themes[selected_name]
     else:
-        theme_colors = DEFAULT_THEMES["Nordic Dark (Default)"]
+        theme_colors = DEFAULT_THEMES["Nordic Dark"]
 
     primary = theme_colors.get("primary", "#88c0d0")
     bg = theme_colors.get("background", "#2e3440")
