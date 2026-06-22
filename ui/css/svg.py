@@ -1,4 +1,4 @@
-/* Force SVG icons inside select inputs, text inputs, sidebars, dialog close triggers, and popovers to match the text color */
+SVG_CSS = """/* Force SVG icons inside select inputs, text inputs, sidebars, dialog close triggers, and popovers to match the text color */
 div[data-baseweb="select"] svg,
 div[data-baseweb="input"] svg,
 div[data-baseweb="base-input"] svg,
@@ -25,3 +25,4 @@ li[role="option"] svg {
     stroke: $clr_bg !important;
     color: $clr_bg !important;
 }
+"""

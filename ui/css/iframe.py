@@ -1,4 +1,4 @@
-/* Collapse the layout container of the shortcut iframe to prevent empty spacing at the bottom */
+IFRAME_CSS = """/* Collapse the layout container of the shortcut iframe to prevent empty spacing at the bottom */
 div.element-container:has(> iframe),
 div.element-container:has(> [data-testid="stIFrame"]),
 div[data-testid="stIFrame"] {
@@ -12,3 +12,4 @@ div[data-testid="stIFrame"] {
     pointer-events: none !important;
     position: absolute !important;
 }
+"""

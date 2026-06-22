@@ -1,4 +1,4 @@
-/* Dialog modal styling overrides */
+DIALOG_CSS = """/* Dialog modal styling overrides */
 div[role="dialog"],
 [data-testid="stDialog"] > div,
 div[data-testid="stDialog"] {
@@ -34,3 +34,4 @@ div[data-testid="stTabBar"] button[aria-selected="true"] p {
     color: $clr_text !important;
     opacity: 0.8;
 }
+"""

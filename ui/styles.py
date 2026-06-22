@@ -86,22 +86,29 @@ def inject_custom_styles(settings_repo):
     text = theme_colors.get("text", "#eceff4")
     border = theme_colors.get("border", f"color-mix(in srgb, {text} 18%, transparent)")
 
-    import os
     from string import Template
+    from ui.css import (
+        BASE_CSS,
+        CARD_CSS,
+        BADGE_CSS,
+        BUTTON_CSS,
+        INPUT_CSS,
+        DIALOG_CSS,
+        SVG_CSS,
+        IFRAME_CSS,
+    )
 
-    # Load and render modular CSS templates
-    css_files = [
-        "base.css",
-        "card.css",
-        "badge.css",
-        "button.css",
-        "input.css",
-        "dialog.css",
-        "svg.css",
-        "iframe.css",
+    # Modular CSS templates
+    css_templates = [
+        BASE_CSS,
+        CARD_CSS,
+        BADGE_CSS,
+        BUTTON_CSS,
+        INPUT_CSS,
+        DIALOG_CSS,
+        SVG_CSS,
+        IFRAME_CSS,
     ]
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    css_dir = os.path.join(current_dir, "css")
 
     compiled_css = []
     mapping = {
@@ -112,16 +119,10 @@ def inject_custom_styles(settings_repo):
         "clr_border": border,
     }
 
-    for filename in css_files:
-        filepath = os.path.join(css_dir, filename)
-        try:
-            with open(filepath, "r", encoding="utf-8") as f:
-                template_str = f.read()
-                # Use Template class to safely replace placeholder tags like $clr_primary, $clr_bg
-                t = Template(template_str)
-                compiled_css.append(t.substitute(mapping))
-        except Exception as e:
-            print(f"Error loading CSS file {filename}: {e}")
+    for template_str in css_templates:
+        # Use Template class to safely replace placeholder tags like $clr_primary, $clr_bg
+        t = Template(template_str)
+        compiled_css.append(t.substitute(mapping))
 
     joined_css = "\n".join(compiled_css)
 

@@ -1,4 +1,4 @@
-/* Streamlit primary/secondary buttons */
+BUTTON_CSS = """/* Streamlit primary/secondary buttons */
 button[kind="primary"],
 [data-testid="stPopoverBody"] button[kind="primary"] {
     background-color: $clr_primary !important;
@@ -89,3 +89,4 @@ div[data-testid="stPopover"] button *::before {
     width: 0 !important;
     height: 0 !important;
 }
+"""

@@ -1,4 +1,4 @@
-@import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
+BASE_CSS = """@import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
 
 /* Theme variables applied to root and key elements */
 :root, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stSidebar"] {
@@ -82,3 +82,4 @@
 html, body, p, li, h1, h2, h3, h4, label, input, select, textarea, button, .snippet-title, .snippet-desc {
     font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
 }
+"""

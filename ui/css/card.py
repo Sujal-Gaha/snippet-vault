@@ -1,4 +1,4 @@
-/* Card design for snippet blocks (including Streamlit's native st.container with border) */
+CARD_CSS = """/* Card design for snippet blocks (including Streamlit's native st.container with border) */
 .snippet-card,
 div[data-testid="stVerticalBlockBorderWrapper"],
 [data-testid="stVerticalBlockBorderWrapper"],
@@ -43,4 +43,4 @@ div.stElementContainer div[data-testid="stVerticalBlock"]:has(.tag-container):ho
     gap: 8px;
     margin-top: 15px;
 }
-
+"""

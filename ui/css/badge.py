@@ -1,4 +1,4 @@
-/* Badge Styling */
+BADGE_CSS = """/* Badge Styling */
 .base-badge {
   padding: 1px 6px !important;
   font-size: 0.6rem !important;
@@ -38,3 +38,4 @@
     vertical-align: middle;
     margin-right: 12px;
 }
+"""

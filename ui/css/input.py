@@ -1,4 +1,4 @@
-/* Input fields and dropdown select components */
+INPUT_CSS = """/* Input fields and dropdown select components */
 div[data-baseweb="select"] > div, 
 div[data-baseweb="input"] > div,
 div[data-baseweb="base-input"] > input,
@@ -99,3 +99,4 @@ div[data-baseweb="menu"] li:hover *,
     background-color: $clr_primary !important;
     color: $clr_bg !important;
 }
+"""
