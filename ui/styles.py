@@ -2,7 +2,7 @@ import json
 import streamlit as st
 
 DEFAULT_THEMES = {
-    "Nordic Dark (Default)": {
+    "Nordic Dark": {
         "primary": "#88c0d0",
         "background": "#2e3440",
         "secondary_background": "#3b4252",

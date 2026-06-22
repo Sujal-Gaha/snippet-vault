@@ -5,6 +5,12 @@ from utils.helpers import format_date
 from ui.components.badge import render_badge
 from ui.components.button import render_button
 from ui.components.input import render_text_input, render_text_area, render_selectbox
+from ui.styles import (
+    DEFAULT_THEMES,
+    load_themes_config,
+    save_themes_config,
+    inject_custom_styles,
+)
 
 
 @st.dialog("Add New Snippet / Command", width="large")
@@ -111,10 +117,7 @@ def view_snippet_dialog(snippet: Snippet):
     cat_html = render_badge(snippet.category, "category")
 
     st.markdown(
-        f"<div>"
-        f"{badge_html}"
-        f"{cat_html}"
-        f"</div>",
+        f"<div>" f"{badge_html}" f"{cat_html}" f"</div>",
         unsafe_allow_html=True,
     )
 
@@ -135,3 +138,394 @@ def view_snippet_dialog(snippet: Snippet):
         st.markdown(
             f'<div class="tag-container">{tag_badges}</div>', unsafe_allow_html=True
         )
+
+
+def _get_valid_hex(color_str: str, fallback: str) -> str:
+    if color_str and color_str.startswith("#"):
+        val = color_str[1:]
+        if len(val) in (3, 6, 4, 8) and all(c in "0123456789abcdefABCDEF" for c in val):
+            if len(val) == 4:
+                return "#" + val[:3]
+            elif len(val) == 8:
+                return "#" + val[:6]
+            return color_str
+    return fallback
+
+
+def reset_theme_gallery():
+    st.session_state.show_theme_gallery = False
+
+
+@st.dialog("Theme Gallery", width="medium", on_dismiss=reset_theme_gallery)
+def theme_gallery_dialog(settings_repo):
+    themes_config = load_themes_config(settings_repo)
+    selected_theme = themes_config.get("selected_theme", "Nordic Dark")
+    custom_themes = themes_config.get("custom_themes", {})
+
+    # Sync session state variable for active theme inside dialog
+    if (
+        "temp_theme" not in st.session_state
+        or st.session_state.temp_theme != selected_theme
+    ):
+        st.session_state.temp_theme = selected_theme
+
+    # Inject custom styles for the gallery cards and overlay buttons
+    st.markdown(
+        """
+        <style>
+        /* Make the immediate parent vertical block relative so overlay buttons align correctly */
+        div:has(> div[class*="st-key-theme_select_"]),
+        div:has(> div[class*="st-key-custom_select_"]) {
+            position: relative !important;
+            max-width: 100px !important;
+            margin: 0 auto !important;
+        }
+        
+        /* Selection overlay button wrapper */
+        div[class*="st-key-theme_select_"],
+        div[class*="st-key-custom_select_"] {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            z-index: 10 !important;
+        }
+        
+        /* Make select buttons transparent and fill the card container */
+        div[class*="st-key-theme_select_"] button,
+        div[class*="st-key-custom_select_"] button {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            opacity: 0 !important;
+            cursor: pointer !important;
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        div[class*="st-key-theme_select_"] button:focus,
+        div[class*="st-key-custom_select_"] button:focus,
+        div[class*="st-key-theme_select_"] button:active,
+        div[class*="st-key-custom_select_"] button:active {
+            box-shadow: none !important;
+            outline: none !important;
+            background: transparent !important;
+        }
+        
+        /* Floating delete button wrapper at top-right */
+        div[class*="st-key-custom_delete_"] {
+            position: absolute !important;
+            top: 4px !important;
+            right: 4px !important;
+            width: 18px !important;
+            height: 18px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            z-index: 20 !important;
+        }
+        
+        /* Style the delete button to look like a small floating circle */
+        div[class*="st-key-custom_delete_"] button {
+            width: 18px !important;
+            height: 18px !important;
+            min-height: 18px !important;
+            max-height: 18px !important;
+            min-width: 18px !important;
+            max-width: 18px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-size: 8px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background-color: rgba(255, 75, 75, 0.15) !important;
+            color: #ff4b4b !important;
+            border: 1px solid rgba(255, 75, 75, 0.25) !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        div[class*="st-key-custom_delete_"] button:hover {
+            background-color: #ff4b4b !important;
+            color: white !important;
+            border-color: #ff4b4b !important;
+            transform: scale(1.1);
+        }
+
+        /* Hover animation for custom theme cards */
+        .theme-card-wrapper {
+            position: relative;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 10px;
+        }
+        
+        /* Hover animation triggered when hovering over the relative parent container */
+        div:has(> div[class*="st-key-theme_select_"]):hover .theme-card-wrapper,
+        div:has(> div[class*="st-key-custom_select_"]):hover .theme-card-wrapper {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    def _sanitize_key(val: str) -> str:
+        return "".join(c if c.isalnum() else "_" for c in val)
+
+    def render_theme_card(name, theme):
+        is_active = name == st.session_state.temp_theme
+
+        # Calculate dynamic borders/shadows
+        text_color = theme.get("text", "#eceff4")
+        bg_color = theme.get("background", "#2e3440")
+        sec_bg = theme.get("secondary_background", "#3b4252")
+        primary_color = theme.get("primary", "#88c0d0")
+
+        border_color = (
+            primary_color
+            if is_active
+            else theme.get("border", "rgba(128, 128, 128, 0.2)")
+        )
+        box_shadow = (
+            f"0 0 15px {primary_color}50, 0 4px 6px rgba(0, 0, 0, 0.15)"
+            if is_active
+            else "0 2px 4px rgba(0, 0, 0, 0.1)"
+        )
+
+        st.markdown(
+            f"""
+            <div class="theme-card-wrapper" style="
+                border: 2px solid {border_color};
+                border-radius: 10px;
+                padding: 6px;
+                margin-bottom: 12px;
+                max-width: 100px;
+                background-color: {sec_bg};
+                box-shadow: {box_shadow};
+            ">
+                <!-- Theme Demo Mockup -->
+                <div style="
+                    background-color: {bg_color};
+                    border-radius: 6px;
+                    padding: 4px;
+                    height: 50px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 3px;
+                    border: 1px solid rgba(128, 128, 128, 0.15);
+                    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
+                ">
+                    <!-- Header row -->
+                    <div style="
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        background-color: {sec_bg};
+                        padding: 1px 4px;
+                        border-radius: 3px;
+                        height: 10px;
+                    ">
+                        <div style="display: flex; gap: 2px;">
+                            <div style="width: 3px; height: 3px; border-radius: 50%; background-color: {primary_color};"></div>
+                            <div style="width: 3px; height: 3px; border-radius: 50%; background-color: {text_color}; opacity: 0.5;"></div>
+                        </div>
+                        <div style="width: 15px; height: 2px; border-radius: 0.5px; background-color: {text_color}; opacity: 0.3;"></div>
+                    </div>
+                    <!-- Body row -->
+                    <div style="
+                        display: flex;
+                        gap: 3px;
+                        flex: 1;
+                    ">
+                        <!-- Sidebar Panel -->
+                        <div style="
+                            width: 35%;
+                            background-color: {sec_bg};
+                            border-radius: 3px;
+                            padding: 2px;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 2px;
+                        ">
+                            <div style="width: 100%; height: 2px; background-color: {text_color}; opacity: 0.4; border-radius: 0.5px;"></div>
+                            <div style="width: 80%; height: 2px; background-color: {text_color}; opacity: 0.3; border-radius: 0.5px;"></div>
+                        </div>
+                        <!-- Main Content Area -->
+                        <div style="
+                            width: 65%;
+                            background-color: {sec_bg};
+                            border-radius: 3px;
+                            padding: 3px;
+                            border: 1px solid {primary_color};
+                            display: flex;
+                            flex-direction: column;
+                            gap: 2px;
+                        ">
+                            <div style="width: 100%; height: 3px; background-color: {primary_color}; opacity: 0.8; border-radius: 0.5px;"></div>
+                            <div style="display: flex; flex-direction: column; gap: 1px;">
+                                <div style="width: 90%; height: 1.5px; background-color: {text_color}; opacity: 0.6; border-radius: 0.5px;"></div>
+                                <div style="width: 70%; height: 1.5px; background-color: {text_color}; opacity: 0.4; border-radius: 0.5px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Theme Name -->
+                <div style="
+                    text-align: center;
+                    font-size: 10px;
+                    font-weight: 600;
+                    color: {text_color};
+                    margin-top: 6px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                ">
+                    {name}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    tab1, tab2 = st.tabs(["Themes", "Custom Themes"])
+
+    with tab1:
+        st.markdown("### Predefined Themes")
+        # Grid of default themes
+        available_defaults = list(DEFAULT_THEMES.keys())
+        # Display 6 themes per row
+        cols = st.columns(6)
+        for idx, name in enumerate(available_defaults):
+            theme = DEFAULT_THEMES[name]
+            col = cols[idx % 6]
+            with col:
+                with st.container():
+                    render_theme_card(name, theme)
+
+                    # Hidden overlay select button
+                    if st.button(
+                        f"Select {name}",
+                        key=f"theme_select_{_sanitize_key(name)}",
+                        use_container_width=True,
+                    ):
+                        save_themes_config(settings_repo, name, custom_themes)
+                        st.session_state.temp_theme = name
+                        st.toast(f"Theme '{name}' applied!")
+                        st.rerun()
+
+    with tab2:
+        st.markdown("### Existing Custom Themes")
+        if not custom_themes:
+            st.info("No custom themes created yet. Use the creator below to build one!")
+        else:
+            available_custom = list(custom_themes.keys())
+            cols = st.columns(6)
+            for idx, name in enumerate(available_custom):
+                theme = custom_themes[name]
+                col = cols[idx % 6]
+                with col:
+                    with st.container():
+                        render_theme_card(name, theme)
+
+                        is_active = name == st.session_state.temp_theme
+
+                        # Hidden overlay select button
+                        if st.button(
+                            f"Select {name}",
+                            key=f"custom_select_{_sanitize_key(name)}",
+                            use_container_width=True,
+                        ):
+                            save_themes_config(settings_repo, name, custom_themes)
+                            st.session_state.temp_theme = name
+                            st.toast(f"Theme '{name}' applied!")
+                            st.rerun()
+
+                        # Floating delete button
+                        if st.button(
+                            "🗑️",
+                            key=f"custom_delete_{_sanitize_key(name)}",
+                            use_container_width=True,
+                            help="Delete theme",
+                        ):
+                            del custom_themes[name]
+                            new_sel = (
+                                "Nordic Dark"
+                                if is_active
+                                else st.session_state.temp_theme
+                            )
+                            save_themes_config(settings_repo, new_sel, custom_themes)
+                            st.session_state.temp_theme = new_sel
+                            st.toast(f"Theme '{name}' deleted!")
+                            st.rerun()
+
+        st.markdown("---")
+        st.markdown("### Create Custom Theme")
+        custom_name = render_text_input(
+            "Theme Name",
+            placeholder="e.g. Lavender Dream",
+            key="custom_theme_name_input",
+        ).strip()
+
+        active_colors = (
+            DEFAULT_THEMES.get(
+                st.session_state.temp_theme,
+                custom_themes.get(
+                    st.session_state.temp_theme, DEFAULT_THEMES["Nordic Dark"]
+                ),
+            )
+            or DEFAULT_THEMES["Nordic Dark"]
+        )
+
+        c_primary = st.color_picker(
+            "Primary Color",
+            _get_valid_hex(active_colors.get("primary", ""), "#88c0d0"),
+            key="picker_primary",
+        )
+        c_bg = st.color_picker(
+            "Background Color",
+            _get_valid_hex(active_colors.get("background", ""), "#2e3440"),
+            key="picker_bg",
+        )
+        c_sec = st.color_picker(
+            "Card Background",
+            _get_valid_hex(active_colors.get("secondary_background", ""), "#3b4252"),
+            key="picker_sec",
+        )
+        c_txt = st.color_picker(
+            "Text Color",
+            _get_valid_hex(active_colors.get("text", ""), "#eceff4"),
+            key="picker_txt",
+        )
+
+        if render_button(
+            "Save & Apply Theme",
+            type="primary",
+            key="save_custom_theme_btn",
+            use_container_width=True,
+        ):
+            if not custom_name:
+                st.error("Theme name cannot be empty.")
+            elif (
+                custom_name in DEFAULT_THEMES or custom_name == "Create Custom Theme..."
+            ):
+                st.error("Cannot overwrite predefined default themes.")
+            else:
+                custom_themes[custom_name] = {
+                    "primary": c_primary,
+                    "background": c_bg,
+                    "secondary_background": c_sec,
+                    "text": c_txt,
+                }
+                save_themes_config(settings_repo, custom_name, custom_themes)
+                st.session_state.temp_theme = custom_name
+                st.toast(f"Theme '{custom_name}' applied and saved!")
+                st.rerun()

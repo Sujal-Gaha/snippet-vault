@@ -7,8 +7,6 @@ from db.repository import SQLSnippetRepository, SQLSettingsRepository
 from ui.styles import (
     inject_custom_styles,
     load_themes_config,
-    save_themes_config,
-    DEFAULT_THEMES,
 )
 from ui.components import (
     SnippetUIRenderer,
@@ -16,6 +14,7 @@ from ui.components import (
     render_text_input,
     render_selectbox,
     add_snippet_dialog,
+    theme_gallery_dialog,
 )
 
 # Page Configuration
@@ -59,89 +58,19 @@ with st.sidebar:
     if "view_mode" not in st.session_state:
         st.session_state.view_mode = "Full Details"
 
+    if "show_theme_gallery" not in st.session_state:
+        st.session_state.show_theme_gallery = False
+
     # Theme Settings configuration and management
     themes_config = load_themes_config(settings_repository)
     selected_theme = themes_config.get("selected_theme", "Nordic Dark (Default)")
-    custom_themes = themes_config.get("custom_themes", {})
 
     st.markdown("---")
     st.header("Theme Settings")
-
-    available_themes = list(DEFAULT_THEMES.keys()) + list(custom_themes.keys())
-    if selected_theme not in available_themes:
-        selected_theme = "Nordic Dark (Default)"
-
-    theme_choice = render_selectbox(
-        "Select Theme",
-        options=available_themes + ["Create Custom Theme..."],
-        index=(
-            available_themes.index(selected_theme)
-            if selected_theme in available_themes
-            else 0
-        ),
-    )
-
-    if theme_choice == "Create Custom Theme...":
-        st.markdown("### Custom Theme Creator")
-        custom_name = render_text_input(
-            "Theme Name", placeholder="e.g. Lavender Dream"
-        ).strip()
-
-        # Use currently active theme colors as picker defaults
-        active_colors = (
-            DEFAULT_THEMES.get(
-                selected_theme,
-                custom_themes.get(
-                    selected_theme, DEFAULT_THEMES["Nordic Dark (Default)"]
-                ),
-            )
-            or DEFAULT_THEMES["Nordic Dark (Default)"]
-        )
-
-        col_p, col_bg = st.columns(2)
-        with col_p:
-            c_primary = st.color_picker("Primary Color", active_colors["primary"])
-        with col_bg:
-            c_bg = st.color_picker("Background Color", active_colors["background"])
-
-        col_sec, col_txt = st.columns(2)
-        with col_sec:
-            c_sec = st.color_picker(
-                "Card Background", active_colors["secondary_background"]
-            )
-        with col_txt:
-            c_txt = st.color_picker("Text Color", active_colors["text"])
-
-        if render_button("Save & Apply Theme", type="primary", use_container_width=True):
-            if not custom_name:
-                st.error("Theme name cannot be empty.")
-            elif (
-                custom_name in DEFAULT_THEMES or custom_name == "Create Custom Theme..."
-            ):
-                st.error("Cannot overwrite predefined default themes.")
-            else:
-                custom_themes[custom_name] = {
-                    "primary": c_primary,
-                    "background": c_bg,
-                    "secondary_background": c_sec,
-                    "text": c_txt,
-                }
-                save_themes_config(settings_repository, custom_name, custom_themes)
-                st.success(f"Theme '{custom_name}' applied and saved!")
-                st.rerun()
-    else:
-        if theme_choice != selected_theme:
-            save_themes_config(settings_repository, theme_choice, custom_themes)
-            st.rerun()
-
-        if theme_choice in custom_themes:
-            if render_button("Delete Custom Theme", use_container_width=True):
-                del custom_themes[theme_choice]
-                save_themes_config(
-                    settings_repository, "Nordic Dark (Default)", custom_themes
-                )
-                st.success(f"Theme '{theme_choice}' deleted!")
-                st.rerun()
+    st.markdown(f"**Active Theme:** `{selected_theme}`")
+    if render_button("Open Theme Gallery", use_container_width=True):
+        st.session_state.show_theme_gallery = True
+        st.rerun()
 
     st.markdown("---")
     st.header("Vault Statistics")
@@ -156,10 +85,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### Keyboard Shortcuts")
-    st.markdown(
-        "- **`Alt + N`**: Add new snippet\n"
-        "- **`Alt + S`**: Toggle sidebar"
-    )
+    st.markdown("- **`Alt + N`**: Add new snippet\n" "- **`Alt + S`**: Toggle sidebar")
 
     st.markdown("---")
     st.markdown("### Formatting Guide")
@@ -264,6 +190,10 @@ else:
             renderer.render_grid(filtered_snippets, unique_cats)
         else:
             renderer.render_list(filtered_snippets, unique_cats)
+
+# Show theme gallery dialog if requested
+if st.session_state.get("show_theme_gallery", False):
+    theme_gallery_dialog(settings_repository)
 
 # Keyboard shortcut handler (Alt + N) to trigger the popup modal
 st.iframe(

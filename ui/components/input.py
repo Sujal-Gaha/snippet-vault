@@ -1,4 +1,4 @@
-from typing import Any, Callable, List, Optional, Union
+from typing import Any, Callable, List, Literal, Optional, Union
 import streamlit as st
 
 def render_text_input(
@@ -8,9 +8,9 @@ def render_text_input(
     max_chars: Optional[int] = None,
     key: Optional[str] = None,
     help: Optional[str] = None,
-    type: str = "default",
+    type: Literal["default", "password"] = "default",
     disabled: bool = False,
-    label_visibility: str = "visible",
+    label_visibility: Literal["visible", "hidden", "collapsed"] = "visible",
 ) -> str:
     """Reusable text input component wrapping Streamlit's native text_input."""
     return st.text_input(
@@ -34,7 +34,7 @@ def render_text_area(
     key: Optional[str] = None,
     help: Optional[str] = None,
     disabled: bool = False,
-    label_visibility: str = "visible",
+    label_visibility: Literal["visible", "hidden", "collapsed"] = "visible",
 ) -> str:
     """Reusable text area component wrapping Streamlit's native text_area."""
     return st.text_area(
@@ -57,7 +57,7 @@ def render_selectbox(
     key: Optional[str] = None,
     help: Optional[str] = None,
     disabled: bool = False,
-    label_visibility: str = "visible",
+    label_visibility: Literal["visible", "hidden", "collapsed"] = "visible",
 ) -> Any:
     """Reusable selectbox component wrapping Streamlit's native selectbox."""
     return st.selectbox(
