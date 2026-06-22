@@ -4,6 +4,7 @@ from db.models import Snippet
 from utils.helpers import format_date
 from ui.components.badge import render_badge
 from ui.components.button import render_button
+from ui.components.input import render_text_input, render_text_area, render_selectbox
 
 
 @st.dialog("Add New Snippet / Command", width="large")
@@ -12,13 +13,13 @@ def add_snippet_dialog(repository: BaseSnippetRepository):
     snippets = repository.get_all()
     existing_cats = repository.get_existing_categories(snippets)
 
-    title = st.text_input(
+    title = render_text_input(
         "Title", placeholder="e.g. Docker Clean Containers", max_chars=100
     )
 
     snippet_type = st.radio("Type", ["Code", "Command"], horizontal=True)
 
-    language = st.selectbox(
+    language = render_selectbox(
         "Syntax Highlighting",
         (
             [
@@ -37,12 +38,12 @@ def add_snippet_dialog(repository: BaseSnippetRepository):
         ),
     )
 
-    content = st.text_area(
+    content = render_text_area(
         "Snippet / Command",
         placeholder="Paste code or command line here...",
         height=150,
     )
-    description = st.text_area(
+    description = render_text_area(
         "Description (supports Markdown)",
         placeholder="What does this do? Supports **bold**, *italics*, `code`, lists, tables, links...",
         height=100,
@@ -51,7 +52,7 @@ def add_snippet_dialog(repository: BaseSnippetRepository):
     # Category selection & creation
     cat_col1, cat_col2 = st.columns(2)
     with cat_col1:
-        cat_sel = st.selectbox(
+        cat_sel = render_selectbox(
             "Assign Category",
             options=existing_cats,
             index=(
@@ -62,13 +63,13 @@ def add_snippet_dialog(repository: BaseSnippetRepository):
             help="Select an existing category from the dropdown",
         )
     with cat_col2:
-        cat_new = st.text_input(
+        cat_new = render_text_input(
             "Or Create New Category",
             placeholder="e.g. Databases, Docker, Git",
             help="Type to create and assign a new category (overrides selection)",
         )
 
-    tags = st.text_input(
+    tags = render_text_input(
         "Tags (comma-separated)", placeholder="e.g. docker, devops, cleanup"
     )
 
@@ -130,9 +131,7 @@ def view_snippet_dialog(snippet: Snippet):
     st.code(snippet.content, language=lang)
 
     if snippet.tags:
-        tag_badges = "".join(
-            [render_badge(tag, "tag") for tag in snippet.tags]
-        )
+        tag_badges = "".join([render_badge(tag, "tag") for tag in snippet.tags])
         st.markdown(
             f'<div class="tag-container">{tag_badges}</div>', unsafe_allow_html=True
         )

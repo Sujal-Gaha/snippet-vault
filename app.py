@@ -10,8 +10,13 @@ from ui.styles import (
     save_themes_config,
     DEFAULT_THEMES,
 )
-from ui.dialogs import add_snippet_dialog
-from ui.components import SnippetUIRenderer, render_button
+from ui.components import (
+    SnippetUIRenderer,
+    render_button,
+    render_text_input,
+    render_selectbox,
+    add_snippet_dialog,
+)
 
 # Page Configuration
 st.set_page_config(
@@ -66,7 +71,7 @@ with st.sidebar:
     if selected_theme not in available_themes:
         selected_theme = "Nordic Dark (Default)"
 
-    theme_choice = st.selectbox(
+    theme_choice = render_selectbox(
         "Select Theme",
         options=available_themes + ["Create Custom Theme..."],
         index=(
@@ -78,7 +83,7 @@ with st.sidebar:
 
     if theme_choice == "Create Custom Theme...":
         st.markdown("### Custom Theme Creator")
-        custom_name = st.text_input(
+        custom_name = render_text_input(
             "Theme Name", placeholder="e.g. Lavender Dream"
         ).strip()
 
@@ -191,19 +196,19 @@ else:
     # Search and Filter Bars - Two Rows for Centered Layout
     search_col, type_col = st.columns([3, 1])
     with search_col:
-        search_query = st.text_input(
+        search_query = render_text_input(
             "Search snippets",
             placeholder="Search in titles, descriptions, categories, tags, or content...",
         )
     with type_col:
-        filter_type = st.selectbox("Type Filter", ["All", "Code", "Command"])
+        filter_type = render_selectbox("Type Filter", ["All", "Code", "Command"])
 
     cat_col, tag_col = st.columns(2)
 
     # Extract unique categories
     unique_cats = repository.get_existing_categories(snippets)
     with cat_col:
-        filter_cat = st.selectbox("Category Filter", ["All"] + unique_cats)
+        filter_cat = render_selectbox("Category Filter", ["All"] + unique_cats)
 
     # Extract unique tags for tag filter
     all_tags = set()
