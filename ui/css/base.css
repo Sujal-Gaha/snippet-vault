@@ -2,54 +2,54 @@
 
 /* Theme variables applied to root and key elements */
 :root, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stSidebar"] {
-    --primary-color: $primary !important;
-    --background-color: $bg !important;
-    --secondary-background-color: $sec_bg !important;
-    --text-color: $text !important;
+    --primary-color: $clr_primary !important;
+    --background-color: $clr_bg !important;
+    --secondary-background-color: $clr_sec_bg !important;
+    --text-color: $clr_text !important;
     
     /* Streamlit specific variables to trigger theme colors on elements */
-    --st-color-background: $bg !important;
-    --st-color-background-secondary: $sec_bg !important;
-    --st-color-text: $text !important;
-    --st-color-primary: $primary !important;
+    --st-color-background: $clr_bg !important;
+    --st-color-background-secondary: $clr_sec_bg !important;
+    --st-color-text: $clr_text !important;
+    --st-color-primary: $clr_primary !important;
 
     /* Shadcn style custom properties mapped to the active theme */
-    --background: $bg !important;
-    --foreground: $text !important;
-    --card: $sec_bg !important;
-    --card-foreground: $text !important;
-    --popover: $sec_bg !important;
-    --popover-foreground: $text !important;
-    --primary: $primary !important;
-    --primary-foreground: $bg !important;
-    --secondary: $sec_bg !important;
-    --secondary-foreground: $text !important;
-    --muted: $sec_bg !important;
-    --muted-foreground: $text !important;
-    --accent: $sec_bg !important;
-    --accent-foreground: $primary !important;
+    --background: $clr_bg !important;
+    --foreground: $clr_text !important;
+    --card: $clr_sec_bg !important;
+    --card-foreground: $clr_text !important;
+    --popover: $clr_sec_bg !important;
+    --popover-foreground: $clr_text !important;
+    --primary: $clr_primary !important;
+    --primary-foreground: $clr_bg !important;
+    --secondary: $clr_sec_bg !important;
+    --secondary-foreground: $clr_text !important;
+    --muted: $clr_sec_bg !important;
+    --muted-foreground: $clr_text !important;
+    --accent: $clr_sec_bg !important;
+    --accent-foreground: $clr_primary !important;
     --destructive: oklch(0.704 0.191 22.216) !important;
-    --border: $border !important;
-    --input: $border !important;
-    --ring: $primary !important;
+    --border: $clr_border !important;
+    --input: $clr_border !important;
+    --ring: $clr_primary !important;
     --radius: 0.65rem !important;
 }
 
 /* Core layout and app container backgrounds */
 .stApp {
-    background-color: $bg !important;
-    color: $text !important;
+    background-color: $clr_bg !important;
+    color: $clr_text !important;
 }
 [data-testid="stAppViewContainer"] {
-    background-color: $bg !important;
-    color: $text !important;
+    background-color: $clr_bg !important;
+    color: $clr_text !important;
 }
 [data-testid="stHeader"] {
-    background-color: $bg !important;
+    background-color: $clr_bg !important;
 }
 [data-testid="stSidebar"] {
-    background-color: $sec_bg !important;
-    border-right: 1px solid $border !important;
+    background-color: $clr_sec_bg !important;
+    border-right: 1px solid $clr_border !important;
 }
 
 /* Sidebar elements overrides */
@@ -59,7 +59,7 @@
 [data-testid="stSidebar"] h2,
 [data-testid="stSidebar"] h3,
 [data-testid="stSidebar"] label {
-    color: $text !important;
+    color: $clr_text !important;
 }
 
 /* Main page and global text overrides for light base theme compatibility */
@@ -75,7 +75,7 @@
 .stApp a,
 .stApp summary,
 .stApp small {
-    color: $text !important;
+    color: $clr_text !important;
 }
 
 /* Global Segoe UI Font override */

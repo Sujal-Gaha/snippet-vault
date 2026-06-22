@@ -1,14 +1,14 @@
 /* Streamlit primary/secondary buttons */
 button[kind="primary"],
 [data-testid="stPopoverBody"] button[kind="primary"] {
-    background-color: $primary !important;
+    background-color: $clr_primary !important;
     border: none !important;
 }
 button[kind="primary"],
 button[kind="primary"] *,
 [data-testid="stPopoverBody"] button[kind="primary"],
 [data-testid="stPopoverBody"] button[kind="primary"] * {
-    color: $bg !important;
+    color: $clr_bg !important;
 }
 button[kind="primary"]:hover {
     opacity: 0.9 !important;
@@ -19,28 +19,28 @@ button[kind="primary"]:hover * {
 }
 
 button[kind="secondary"] {
-    background-color: $sec_bg !important;
-    border: 1px solid $border !important;
+    background-color: $clr_sec_bg !important;
+    border: 1px solid $clr_border !important;
 }
 button[kind="secondary"],
 button[kind="secondary"] * {
-    color: $text !important;
+    color: $clr_text !important;
 }
 button[kind="secondary"]:hover {
-    border-color: $primary !important;
-    background-color: $bg !important;
+    border-color: $clr_primary !important;
+    background-color: $clr_bg !important;
 }
 button[kind="secondary"]:hover * {
-    color: $primary !important;
+    color: $clr_primary !important;
 }
 
 /* Popovers background adjustment */
 div[data-testid="stPopoverBody"] {
-    background-color: $sec_bg !important;
-    border: 1px solid $border !important;
+    background-color: $clr_sec_bg !important;
+    border: 1px solid $clr_border !important;
 }
 div[data-testid="stPopoverBody"] * {
-    color: $text !important;
+    color: $clr_text !important;
 }
 
 /* Style the st.popover trigger buttons to look like a clean, borderless menu icon */
@@ -53,7 +53,7 @@ div[data-testid="stPopover"] button {
     width: auto !important;
     min-width: 0 !important;
     min-height: 0 !important;
-    color: $text !important;
+    color: $clr_text !important;
     cursor: pointer !important;
     transition: color 0.15s ease, background-color 0.15s ease !important;
 }
@@ -61,7 +61,7 @@ div[data-testid="stPopover"] button {
 div[data-testid="stPopover"] button:hover,
 div[data-testid="stPopover"] button:active,
 div[data-testid="stPopover"] button:focus {
-    color: $primary !important;
+    color: $clr_primary !important;
     background-color: rgba(128, 128, 128, 0.15) !important;
     border-radius: 50% !important;
     outline: none !important;

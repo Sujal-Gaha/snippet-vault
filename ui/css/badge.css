@@ -1,0 +1,49 @@
+/* Badge Styling */
+.tag-badge {
+    background-color: $clr_bg !important;
+    color: $clr_text !important;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid $clr_border;
+}
+
+.type-badge-code {
+    background-color: $clr_primary !important;
+    color: $clr_bg !important;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-right: 12px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.type-badge-command {
+    background-color: #bf616a !important;
+    color: #eceff4 !important;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-right: 12px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.category-badge {
+    background-color: $clr_bg !important;
+    color: $clr_primary !important;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    border: 1px solid $clr_border;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 12px;
+}

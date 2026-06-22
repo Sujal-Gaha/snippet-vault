@@ -11,7 +11,7 @@ from ui.styles import (
     DEFAULT_THEMES,
 )
 from ui.dialogs import add_snippet_dialog
-from ui.components import SnippetUIRenderer
+from ui.components import SnippetUIRenderer, render_button
 
 # Page Configuration
 st.set_page_config(
@@ -39,7 +39,7 @@ with col_title:
     )
 with col_btn:
     st.markdown("<div style='height: 25px;'></div>", unsafe_allow_html=True)
-    if st.button("Add Snippet (Alt+N)", type="primary", use_container_width=True):
+    if render_button("Add Snippet (Alt+N)", type="primary", use_container_width=True):
         # Open Dialog, injecting the dependency repository instance
         add_snippet_dialog(repository)
 
@@ -107,7 +107,7 @@ with st.sidebar:
         with col_txt:
             c_txt = st.color_picker("Text Color", active_colors["text"])
 
-        if st.button("Save & Apply Theme", type="primary", use_container_width=True):
+        if render_button("Save & Apply Theme", type="primary", use_container_width=True):
             if not custom_name:
                 st.error("Theme name cannot be empty.")
             elif (
@@ -130,7 +130,7 @@ with st.sidebar:
             st.rerun()
 
         if theme_choice in custom_themes:
-            if st.button("Delete Custom Theme", use_container_width=True):
+            if render_button("Delete Custom Theme", use_container_width=True):
                 del custom_themes[theme_choice]
                 save_themes_config(
                     settings_repository, "Nordic Dark (Default)", custom_themes
@@ -175,14 +175,14 @@ else:
         full_type: Literal["primary", "secondary"] = (
             "primary" if st.session_state.view_mode == "Full Details" else "secondary"
         )
-        if st.button("List View", type=full_type, use_container_width=True):
+        if render_button("List View", type=full_type, use_container_width=True):
             st.session_state.view_mode = "Full Details"
             st.rerun()
     with view_col2:
         grid_type: Literal["primary", "secondary"] = (
             "primary" if st.session_state.view_mode == "Compact Grid" else "secondary"
         )
-        if st.button("Grid View", type=grid_type, use_container_width=True):
+        if render_button("Grid View", type=grid_type, use_container_width=True):
             st.session_state.view_mode = "Compact Grid"
             st.rerun()
 

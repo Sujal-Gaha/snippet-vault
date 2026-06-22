@@ -21,7 +21,7 @@ DEFAULT_THEMES = {
         "background": "oklch(0.141 0.005 285.823)",
         "secondary_background": "oklch(0.21 0.006 285.885)",
         "text": "oklch(0.985 0 0)",
-        "border": "rgba(255, 255, 255, 0.12)",
+        "border": "oklch(1 0 0 / 10%)",
     },
     "Rose Light": {
         "primary": "oklch(0.637 0.237 25.331)",
@@ -93,6 +93,7 @@ def inject_custom_styles(settings_repo):
     css_files = [
         "base.css",
         "card.css",
+        "badge.css",
         "button.css",
         "input.css",
         "dialog.css",
@@ -104,11 +105,11 @@ def inject_custom_styles(settings_repo):
 
     compiled_css = []
     mapping = {
-        "primary": primary,
-        "bg": bg,
-        "sec_bg": sec_bg,
-        "text": text,
-        "border": border,
+        "clr_primary": primary,
+        "clr_bg": bg,
+        "clr_sec_bg": sec_bg,
+        "clr_text": text,
+        "clr_border": border,
     }
 
     for filename in css_files:
@@ -116,7 +117,7 @@ def inject_custom_styles(settings_repo):
         try:
             with open(filepath, "r", encoding="utf-8") as f:
                 template_str = f.read()
-                # Use Template class to safely replace placeholder tags like $primary, $bg
+                # Use Template class to safely replace placeholder tags like $clr_primary, $clr_bg
                 t = Template(template_str)
                 compiled_css.append(t.substitute(mapping))
         except Exception as e:

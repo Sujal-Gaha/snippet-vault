@@ -2,6 +2,8 @@ import streamlit as st
 from db.repository import BaseSnippetRepository
 from db.models import Snippet
 from utils.helpers import format_date
+from ui.components.badge import render_badge
+from ui.components.button import render_button
 
 
 @st.dialog("Add New Snippet / Command", width="large")
@@ -72,7 +74,7 @@ def add_snippet_dialog(repository: BaseSnippetRepository):
 
     col1, col2, col3 = st.columns([1.2, 1.2, 3])
     with col1:
-        if st.button("Save", type="primary", use_container_width=True):
+        if render_button("Save", type="primary", use_container_width=True):
             if not title.strip():
                 st.error("Please enter a title.")
             elif not content.strip():
@@ -97,18 +99,20 @@ def add_snippet_dialog(repository: BaseSnippetRepository):
                 st.success("Saved!")
                 st.rerun()
     with col2:
-        if st.button("Cancel", use_container_width=True):
+        if render_button("Cancel", use_container_width=True):
             st.rerun()
 
 
 @st.dialog("Snippet Details", width="large")
 def view_snippet_dialog(snippet: Snippet):
-    badge_class = "type-badge-code" if snippet.type == "Code" else "type-badge-command"
+    badge_type = "code" if snippet.type == "Code" else "command"
+    badge_html = render_badge(snippet.type, badge_type)
+    cat_html = render_badge(snippet.category, "category")
 
     st.markdown(
         f"<div>"
-        f'<span class="{badge_class}">{snippet.type}</span>'
-        f'<span class="category-badge">{snippet.category}</span>'
+        f"{badge_html}"
+        f"{cat_html}"
         f"</div>",
         unsafe_allow_html=True,
     )
@@ -127,7 +131,7 @@ def view_snippet_dialog(snippet: Snippet):
 
     if snippet.tags:
         tag_badges = "".join(
-            [f'<span class="tag-badge">#{tag}</span>' for tag in snippet.tags]
+            [render_badge(tag, "tag") for tag in snippet.tags]
         )
         st.markdown(
             f'<div class="tag-container">{tag_badges}</div>', unsafe_allow_html=True

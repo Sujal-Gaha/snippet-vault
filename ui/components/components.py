@@ -2,8 +2,9 @@ import html
 import streamlit as st
 from db.repository import BaseSnippetRepository
 from db.models import Snippet
-from ui.dialogs import view_snippet_dialog
 from utils.helpers import truncate_desc, format_date
+from ui.components.badge import render_badge
+from ui.components.button import render_button
 
 
 class SnippetUIRenderer:
@@ -12,24 +13,11 @@ class SnippetUIRenderer:
     def __init__(self, repository: BaseSnippetRepository):
         self.repository = repository
 
-    def _render_badge(self, label: str, badge_type: str, custom_style: str = "") -> str:
-        """Reusable HTML component for rendering badges."""
-        escaped_label = html.escape(label)
-        if badge_type == "code":
-            return f'<span class="type-badge-code" style="{custom_style}">{escaped_label}</span>'
-        elif badge_type == "command":
-            return f'<span class="type-badge-command" style="{custom_style}">{escaped_label}</span>'
-        elif badge_type == "category":
-            return f'<span class="category-badge" style="{custom_style}">{escaped_label}</span>'
-        elif badge_type == "tag":
-            return f'<span class="tag-badge" style="{custom_style}">#{escaped_label}</span>'
-        return escaped_label
-
     def _render_tags_row(self, tags: list[str]) -> None:
         """Reusable UI component for rendering the tags section."""
         if not tags:
             return
-        tag_badges = "".join([self._render_badge(tag, "tag") for tag in tags])
+        tag_badges = "".join([render_badge(tag, "tag") for tag in tags])
         st.markdown(
             f'<div class="tag-container">{tag_badges}</div>',
             unsafe_allow_html=True,
@@ -38,8 +26,8 @@ class SnippetUIRenderer:
     def _render_snippet_header_html(self, snippet: Snippet) -> str:
         """Reusable HTML component for snippet metadata header in List View."""
         badge_type = "code" if snippet.type == "Code" else "command"
-        badge_html = self._render_badge(snippet.type, badge_type)
-        cat_html = self._render_badge(snippet.category, "category")
+        badge_html = render_badge(snippet.type, badge_type)
+        cat_html = render_badge(snippet.category, "category")
         escaped_title = html.escape(snippet.title)
         date_str = format_date(snippet.created_at)
 
@@ -57,10 +45,10 @@ class SnippetUIRenderer:
     def _render_grid_header_html(self, snippet: Snippet) -> str:
         """Reusable HTML component for snippet metadata header in Grid View."""
         badge_type = "code" if snippet.type == "Code" else "command"
-        badge_html = self._render_badge(
+        badge_html = render_badge(
             snippet.type, badge_type, "font-size: 0.7rem; padding: 2px 6px;"
         )
-        cat_html = self._render_badge(
+        cat_html = render_badge(
             snippet.category, "category", "font-size: 0.7rem; padding: 2px 6px;"
         )
         escaped_title = html.escape(snippet.title)
@@ -127,9 +115,10 @@ class SnippetUIRenderer:
                     # Footer: buttons row
                     btn_col1, btn_col2 = st.columns([4, 1])
                     with btn_col1:
-                        if st.button(
+                        if render_button(
                             "View", key=f"comp_view_{s.id}", use_container_width=True
                         ):
+                            from ui.dialogs import view_snippet_dialog
                             view_snippet_dialog(s)
                     with btn_col2:
                         self.render_options_popover(s, unique_cats, is_compact=True)
@@ -163,7 +152,7 @@ class SnippetUIRenderer:
                 placeholder="e.g. Databases, Docker",
                 key=f"{prefix}move_txt_{snippet.id}",
             )
-            if st.button(
+            if render_button(
                 "Apply Move",
                 key=f"{prefix}move_btn_{snippet.id}",
                 type="primary",
@@ -178,7 +167,7 @@ class SnippetUIRenderer:
 
             st.markdown("---")
             st.markdown("**Danger Zone**")
-            if st.button(
+            if render_button(
                 "Delete Snippet",
                 key=f"{prefix}del_{snippet.id}",
                 type="secondary",
