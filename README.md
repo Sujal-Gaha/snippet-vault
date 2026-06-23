@@ -8,7 +8,7 @@ A minimal, beautiful, and self-hosted Streamlit application for uploading, searc
 - **Syntax Highlighting:** Choose language formatting (Python, SQL, Shell, YAML, JSON, CSS, JavaScript, HTML, Plain Text).
 - **Tagging System:** Organize snippets with searchable tags.
 - **Search & Filters:** Real-time search across titles, content, descriptions, and tags. Filter by tags or types.
-- **Flexible Storage:** Supports both a lightweight SQLite database and a production-ready MySQL backend.
+- **Database Storage:** Powered by a lightweight SQLite database.
 - **Dark-themed UI:** Modern, clean Nordic dark design.
 
 ## Configuration (.env)
@@ -21,28 +21,19 @@ cp example.env .env
 
 Available variables:
 
-- `DB_TYPE`: `sqlite` (default) or `mysql`
 - `SQLITE_DB_PATH`: Path to SQLite database file (defaults to `snippets.db`)
-- `MYSQL_HOST`: MySQL database host
-- `MYSQL_PORT`: MySQL port (defaults to `3306`)
-- `MYSQL_DATABASE`: MySQL database name
-- `MYSQL_USER`: MySQL user
-- `MYSQL_PASSWORD`: MySQL password
-- `MYSQL_ROOT_PASSWORD`: MySQL root password (required for initialization in container)
 
 ## Quickstart
 
-### 1. Recommended Setup: Running with Docker Compose (MySQL Backend)
+### 1. Recommended Setup: Running with Docker Compose (SQLite Backend)
 
-To launch both the Streamlit web application and the MySQL database in an isolated container network:
+To launch the Streamlit web application and persist its database in a containerized setup:
 
 1. Copy the environment configuration template:
 
    ```bash
    cp example.env .env
    ```
-
-   Modify `.env` to set `DB_TYPE=mysql` (along with any custom usernames or passwords if needed).
 
 2. Build and start the containerized services:
 
@@ -54,9 +45,9 @@ To launch both the Streamlit web application and the MySQL database in an isolat
 
 ---
 
-### 2. Alternative Setup: Local Python Virtual Environment (SQLite Backend)
+### 2. Alternative Setup: Local Python Virtual Environment
 
-For a lightweight, local SQLite database run:
+For running the application locally on your host machine:
 
 1. Set up a virtual environment:
 

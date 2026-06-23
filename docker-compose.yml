@@ -1,25 +1,6 @@
 version: '3.8'
 
 services:
-  db:
-    image: mysql:8.0
-    container_name: snippet-vault-db
-    restart: always
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-snippet_vault}
-      MYSQL_USER: ${MYSQL_USER:-mysql_user}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mysql_password}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-mysql_root_password}
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   web:
     build: .
     container_name: snippet-vault-web
@@ -29,15 +10,6 @@ services:
     env_file:
       - .env
     environment:
-      # Override DB host when running inside the docker network
-      MYSQL_HOST: db
-    depends_on:
-      db:
-        condition: service_healthy
+      SQLITE_DB_PATH: /app/snippets.db
     volumes:
-      # Optional: persist sqlite database if user switches DB_TYPE to sqlite in .env
-      - sqlite_data:/app/data
-
-volumes:
-  mysql_data:
-  sqlite_data:
+      - ./snippets.db:/app/snippets.db
