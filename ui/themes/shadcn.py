@@ -5,7 +5,6 @@ SHADCN_THEMES = {
         "secondary_background": "oklch(0.9700 0 0)",
         "text": "oklch(0.1450 0 0)",
         "border": "oklch(0.9220 0 0)",
-        
         "foreground": "oklch(0.1450 0 0)",
         "card": "oklch(1 0 0)",
         "card_foreground": "oklch(0.1450 0 0)",
@@ -55,7 +54,6 @@ SHADCN_THEMES = {
         "secondary_background": "oklch(0.2050 0 0)",
         "text": "oklch(0.9850 0 0)",
         "border": "oklch(0.2750 0 0)",
-        
         "foreground": "oklch(0.9850 0 0)",
         "card": "oklch(0.2050 0 0)",
         "card_foreground": "oklch(0.9850 0 0)",

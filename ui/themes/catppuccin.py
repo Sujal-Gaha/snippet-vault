@@ -5,7 +5,6 @@ CATPPUCCIN_THEMES = {
         "secondary_background": "oklch(0.9060 0.0117 264.5071)",
         "text": "oklch(0.4355 0.0430 279.3250)",
         "border": "oklch(0.8083 0.0174 271.1982)",
-        
         "foreground": "oklch(0.4355 0.0430 279.3250)",
         "card": "oklch(1.0000 0 0)",
         "card_foreground": "oklch(0.4355 0.0430 279.3250)",
@@ -55,7 +54,6 @@ CATPPUCCIN_THEMES = {
         "secondary_background": "oklch(0.2973 0.0294 276.2144)",
         "text": "oklch(0.8787 0.0426 272.2767)",
         "border": "oklch(0.3240 0.0319 281.9784)",
-        
         "foreground": "oklch(0.8787 0.0426 272.2767)",
         "card": "oklch(0.2429 0.0304 283.9110)",
         "card_foreground": "oklch(0.8787 0.0426 272.2767)",

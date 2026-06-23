@@ -5,7 +5,6 @@ NEO_BRUTALISM_THEMES = {
         "secondary_background": "oklch(0.9551 0 0)",
         "text": "oklch(0 0 0)",
         "border": "oklch(0 0 0)",
-        
         "foreground": "oklch(0 0 0)",
         "card": "oklch(1.0000 0 0)",
         "card_foreground": "oklch(0 0 0)",
@@ -55,7 +54,6 @@ NEO_BRUTALISM_THEMES = {
         "secondary_background": "oklch(0.2178 0 0)",
         "text": "oklch(1.0000 0 0)",
         "border": "oklch(1.0000 0 0)",
-        
         "foreground": "oklch(1.0000 0 0)",
         "card": "oklch(0.3211 0 0)",
         "card_foreground": "oklch(1.0000 0 0)",

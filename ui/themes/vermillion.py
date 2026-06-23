@@ -5,7 +5,6 @@ VERMILLION_THEMES = {
         "secondary_background": "oklch(0.9512 0.0034 247.8591)",
         "text": "oklch(0.2213 0.0066 258.3651)",
         "border": "oklch(0.9113 0.0052 247.8814)",
-        
         "foreground": "oklch(0.2213 0.0066 258.3651)",
         "card": "oklch(1.0000 0 0)",
         "card_foreground": "oklch(0.2213 0.0066 258.3651)",
@@ -55,7 +54,6 @@ VERMILLION_THEMES = {
         "secondary_background": "oklch(0.2682 0.0080 264.4320)",
         "text": "oklch(0.9489 0.0029 264.5417)",
         "border": "oklch(0.2998 0.0084 255.5649)",
-        
         "foreground": "oklch(0.9489 0.0029 264.5417)",
         "card": "oklch(0.2299 0.0065 258.3639)",
         "card_foreground": "oklch(0.9489 0.0029 264.5417)",

@@ -5,7 +5,6 @@ ROSE_THEMES = {
         "secondary_background": "oklch(0.21 0.006 285.885)",
         "text": "oklch(0.985 0 0)",
         "border": "oklch(1 0 0 / 10%)",
-        
         "foreground": "oklch(0.985 0 0)",
         "card": "oklch(0.21 0.006 285.885)",
         "card_foreground": "oklch(0.985 0 0)",
@@ -44,7 +43,6 @@ ROSE_THEMES = {
         "secondary_background": "oklch(0.967 0.001 286.375)",
         "text": "oklch(0.141 0.005 285.823)",
         "border": "oklch(0.92 0.004 286.32)",
-        
         "foreground": "oklch(0.141 0.005 285.823)",
         "card": "oklch(1 0 0)",
         "card_foreground": "oklch(0.141 0.005 285.823)",
