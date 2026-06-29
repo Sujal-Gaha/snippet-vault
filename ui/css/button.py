@@ -3,8 +3,11 @@ button[kind="primary"],
 [data-testid="stPopoverBody"] button[kind="primary"] {
     background-color: var(--primary) !important;
     border: var(--border-width) solid var(--border) !important;
-    border-radius: var(--radius) !important;
+    border-radius: var(--radius-md, var(--radius)) !important;
     box-shadow: var(--shadow-sm) !important;
+    padding: 4px 10px !important;
+    font-size: 0.85rem !important;
+    min-height: 28px !important;
 }
 button[kind="primary"],
 button[kind="primary"] *,
@@ -23,8 +26,11 @@ button[kind="primary"]:hover * {
 button[kind="secondary"] {
     background-color: var(--secondary) !important;
     border: var(--border-width) solid var(--border) !important;
-    border-radius: var(--radius) !important;
+    border-radius: var(--radius-md, var(--radius)) !important;
     box-shadow: var(--shadow-2xs) !important;
+    padding: 4px 10px !important;
+    font-size: 0.85rem !important;
+    min-height: 28px !important;
 }
 button[kind="secondary"],
 button[kind="secondary"] * {
@@ -43,8 +49,10 @@ button[kind="secondary"]:hover * {
 div[data-testid="stPopoverBody"] {
     background-color: var(--popover) !important;
     border: var(--border-width) solid var(--border) !important;
-    border-radius: var(--radius) !important;
+    border-radius: var(--radius-md, var(--radius)) !important;
     box-shadow: var(--shadow-md) !important;
+    padding: 8px 12px !important;
+    min-width: 320px !important;
 }
 div[data-testid="stPopoverBody"] * {
     color: var(--popover-foreground) !important;
@@ -63,12 +71,40 @@ div[class*="stPopoverBody"] [data-testid="stVerticalBlockBorderWrapper"] {
     margin: 0 !important;
 }
 
+/* Reduce spacing inside popovers */
+[data-testid="stPopoverBody"] [data-testid="stVerticalBlock"],
+div[class*="stPopoverBody"] [data-testid="stVerticalBlock"] {
+    gap: 6px !important;
+}
+
+[data-testid="stPopoverBody"] hr,
+div[class*="stPopoverBody"] hr {
+    margin: 6px 0 !important;
+}
+
+[data-testid="stPopoverBody"] [data-testid="stMarkdownContainer"] p,
+[data-testid="stPopoverBody"] [data-testid="stMarkdownContainer"] h1,
+[data-testid="stPopoverBody"] [data-testid="stMarkdownContainer"] h2,
+[data-testid="stPopoverBody"] [data-testid="stMarkdownContainer"] h3,
+[data-testid="stPopoverBody"] [data-testid="stMarkdownContainer"] h4,
+[data-testid="stPopoverBody"] [data-testid="stMarkdownContainer"] h5,
+[data-testid="stPopoverBody"] [data-testid="stMarkdownContainer"] h6,
+div[class*="stPopoverBody"] [data-testid="stMarkdownContainer"] p {
+    margin-top: 0 !important;
+    margin-bottom: 2px !important;
+}
+
+[data-testid="stPopoverBody"] [data-testid="element-container"],
+div[class*="stPopoverBody"] [data-testid="element-container"] {
+    margin-bottom: 2px !important;
+}
+
 /* Style the st.popover trigger buttons to look like a clean, borderless menu icon */
 div[data-testid="stPopover"] button {
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 6px 12px !important;
+    padding: 4px 8px !important;
     margin: 0 !important;
     width: auto !important;
     min-width: 0 !important;

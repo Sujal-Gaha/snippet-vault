@@ -5,7 +5,7 @@ div[data-testid="stDialog"] {
     background-color: var(--popover) !important;
     color: var(--popover-foreground) !important;
     border: var(--border-width) solid var(--border) !important;
-    border-radius: var(--radius) !important;
+    border-radius: var(--radius-md, var(--radius)) !important;
     box-shadow: var(--shadow-xl) !important;
 }
 div[role="dialog"] h1,

@@ -7,9 +7,9 @@ div.stElementContainer div[data-testid="stVerticalBlock"]:has(.snippet-card),
 div.stElementContainer div[data-testid="stVerticalBlock"]:has([data-testid="stCodeBlock"]),
 div.stElementContainer div[data-testid="stVerticalBlock"]:has(.tag-container) {
     background-color: var(--card) !important;
-    border-radius: var(--radius-lg, var(--radius)) !important;
-    padding: 24px !important;
-    margin-bottom: 24px !important;
+    border-radius: var(--radius-md, var(--radius)) !important;
+    padding: 16px !important;
+    margin-bottom: 16px !important;
     border: var(--border-width) solid var(--border) !important;
     border-style: solid !important;
     border-width: var(--border-width) !important;
@@ -30,7 +30,7 @@ div.stElementContainer div[data-testid="stVerticalBlock"]:has(.tag-container):ho
 
 .snippet-title {
     color: var(--primary) !important;
-    font-size: 1.4rem;
+    font-size: 1.15rem;
     font-weight: 600;
     display: inline-block;
 }
@@ -40,6 +40,6 @@ div.stElementContainer div[data-testid="stVerticalBlock"]:has(.tag-container):ho
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 """

@@ -51,7 +51,9 @@ with col_title:
 with col_btn:
     st.markdown("<div style='height: 25px;'></div>", unsafe_allow_html=True)
     add_shortcut = shortcuts.get("add_snippet", "Alt+N")
-    if render_button(f"Add Snippet ({add_shortcut})", type="primary", use_container_width=True):
+    if render_button(
+        f"Add Snippet ({add_shortcut})", type="primary", use_container_width=True
+    ):
         # Open Dialog, injecting the dependency repository instance
         add_snippet_dialog(repository)
 
@@ -81,33 +83,19 @@ with st.sidebar:
         st.rerun()
 
     st.markdown("---")
-    st.header("Vault Statistics")
-    if snippets:
-        st.metric("Total Items", len(snippets))
-        st.metric("Code Snippets", len([s for s in snippets if s.type == "Code"]))
-        st.metric(
-            "Terminal Commands", len([s for s in snippets if s.type == "Command"])
-        )
-    else:
-        st.info("Your vault is empty.")
-
-    st.markdown("---")
     st.markdown("### Keyboard Shortcuts")
     st.markdown(
         f"- **`{shortcuts.get('add_snippet', 'Alt+N')}`**: Add new snippet\n"
         f"- **`{shortcuts.get('toggle_sidebar', 'Alt+S')}`**: Toggle sidebar\n"
         f"- **`{shortcuts.get('show_shortcuts', 'Alt+/')}`**: Shortcuts guide & settings"
     )
-    if render_button("Configure Shortcuts", use_container_width=True, key="config_shortcuts_sidebar_btn"):
+    if render_button(
+        "Configure Shortcuts",
+        use_container_width=True,
+        key="config_shortcuts_sidebar_btn",
+    ):
         st.session_state.show_shortcuts = True
         st.rerun()
-
-    st.markdown("---")
-    st.markdown("### Formatting Guide")
-    st.markdown(
-        "You can use **Markdown** syntax in the description field to format text with "
-        "**bold**, *italics*, `code blocks`, links, list bullets, or even tables."
-    )
 
 # Main Area - Search & Filtering
 if not snippets:

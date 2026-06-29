@@ -37,8 +37,10 @@ class SnippetUIRenderer:
             help="Options",
             key=f"{prefix}opt_pop_{snippet.id}",
         ):
-            st.markdown("Options")
+            st.markdown("##### Options")
 
+            st.markdown("**Actions**")
+            st.markdown("")
             if render_button(
                 "Edit Snippet",
                 key=f"{prefix}edit_btn_{snippet.id}",
@@ -46,12 +48,21 @@ class SnippetUIRenderer:
                 use_container_width=True,
             ):
                 from ui.components.dialogs import edit_snippet_dialog
+
                 edit_snippet_dialog(self.repository, snippet)
 
-            st.markdown("---")
-            st.markdown("**Move Category**")
+            if render_button(
+                "Delete Snippet",
+                key=f"{prefix}del_{snippet.id}",
+                type="secondary",
+                use_container_width=True,
+            ):
+                self.repository.delete(snippet.id)
+                st.success("Deleted!")
+                st.rerun()
+
             new_cat_sel = render_selectbox(
-                "Destination Category",
+                "Move Category",
                 options=unique_cats,
                 index=(
                     unique_cats.index(snippet.category)
@@ -76,16 +87,4 @@ class SnippetUIRenderer:
                     final_cat = "Uncategorized"
                 self.repository.update_category(snippet.id, final_cat)
                 st.success(f"Moved to {final_cat}!")
-                st.rerun()
-
-            st.markdown("---")
-            st.markdown("**Danger Zone**")
-            if render_button(
-                "Delete Snippet",
-                key=f"{prefix}del_{snippet.id}",
-                type="secondary",
-                use_container_width=True,
-            ):
-                self.repository.delete(snippet.id)
-                st.success("Deleted!")
                 st.rerun()

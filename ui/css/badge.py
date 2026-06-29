@@ -16,7 +16,7 @@ BADGE_CSS = """/* Badge Styling */
     background-color: var(--primary) !important;
     color: var(--primary-foreground) !important;
     text-transform: uppercase;
-    margin-right: 12px;
+    margin-right: 8px;
     display: inline-block;
     vertical-align: middle;
     border: var(--border-width) solid var(--border) !important;
@@ -26,7 +26,7 @@ BADGE_CSS = """/* Badge Styling */
     background-color: var(--destructive) !important;
     color: var(--destructive-foreground) !important;
     text-transform: uppercase;
-    margin-right: 12px;
+    margin-right: 8px;
     display: inline-block;
     vertical-align: middle;
     border: var(--border-width) solid var(--border) !important;
@@ -38,6 +38,6 @@ BADGE_CSS = """/* Badge Styling */
     border: var(--border-width) solid var(--border) !important;
     display: inline-block;
     vertical-align: middle;
-    margin-right: 12px;
+    margin-right: 8px;
 }
 """

@@ -7,7 +7,8 @@ input {
     background-color: var(--background) !important;
     color: var(--foreground) !important;
     border: var(--border-width) solid var(--border) !important;
-    border-radius: var(--radius) !important;
+    border-radius: var(--radius-md, var(--radius)) !important;
+    font-size: 0.85rem !important;
 }
 
 div[data-baseweb="select"] *, 
@@ -41,7 +42,7 @@ div[data-testid="stVirtualDropdown"] > div,
 [data-testid="stVirtualDropdown"] {
     background-color: var(--popover) !important;
     border: var(--border-width) solid var(--border) !important;
-    border-radius: var(--radius) !important;
+    border-radius: var(--radius-md, var(--radius)) !important;
 }
 div[data-baseweb="popover"] ul,
 div[data-baseweb="menu"] ul,

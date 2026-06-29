@@ -32,7 +32,7 @@ def _render_snippet_header_html(snippet: Snippet) -> str:
         f"{badge_html}"
         f"{cat_html}"
         f"</div>"
-        f'<div style="color: var(--text-color); opacity: 0.65; font-size: 0.85rem; margin-top: 6px; margin-bottom: 12px;">'
+        f'<div style="color: var(--text-color); opacity: 0.65; font-size: 0.75rem; margin-top: 4px; margin-bottom: 8px;">'
         f"Added on {date_str}</div>"
     )
 
@@ -41,18 +41,18 @@ def _render_grid_header_html(snippet: Snippet) -> str:
     """Reusable HTML component for snippet metadata header in Grid View."""
     badge_type = "code" if snippet.type == "Code" else "command"
     badge_html = render_badge(
-        snippet.type, badge_type, "font-size: 0.7rem; padding: 2px 6px;"
+        snippet.type, badge_type, "font-size: 0.65rem; padding: 1.5px 5px;"
     )
     cat_html = render_badge(
-        snippet.category, "category", "font-size: 0.7rem; padding: 2px 6px;"
+        snippet.category, "category", "font-size: 0.65rem; padding: 1.5px 5px;"
     )
     escaped_title = html.escape(snippet.title)
 
     return (
-        f'<div style="min-height: 80px;">'
+        f'<div style="min-height: 64px;">'
         f"{badge_html}"
         f"{cat_html}"
-        f'<div class="snippet-title" style="font-size: 1.1rem; margin-top: 6px;">{escaped_title}</div>'
+        f'<div class="snippet-title" style="font-size: 0.95rem; margin-top: 4px;">{escaped_title}</div>'
         f"</div>"
     )
 
@@ -98,12 +98,12 @@ def render_grid_card(
         if desc_truncated:
             escaped_desc = html.escape(desc_truncated)
             st.markdown(
-                f'<div style="font-size: 0.9rem; min-height: 60px; color: var(--text-color); opacity: 0.85; line-height: 1.4; margin-bottom: 12px;">{escaped_desc}</div>',
+                f'<div style="font-size: 0.8rem; min-height: 48px; color: var(--text-color); opacity: 0.85; line-height: 1.4; margin-bottom: 8px;">{escaped_desc}</div>',
                 unsafe_allow_html=True,
             )
         else:
             st.markdown(
-                '<div style="min-height: 60px; font-style: italic; color: gray; font-size: 0.9rem; margin-bottom: 12px;">No description provided.</div>',
+                '<div style="min-height: 48px; font-style: italic; color: gray; font-size: 0.8rem; margin-bottom: 8px;">No description provided.</div>',
                 unsafe_allow_html=True,
             )
 
