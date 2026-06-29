@@ -9,11 +9,10 @@ from ui.styles import (
     DEFAULT_THEMES,
     load_themes_config,
     save_themes_config,
-    inject_custom_styles,
 )
 
 
-@st.dialog("Add New Snippet / Command", width="large")
+@st.dialog("Add New Snippet / Command", width="small")
 def add_snippet_dialog(repository: BaseSnippetRepository):
     # Fetch fresh list for category selectbox
     snippets = repository.get_all()
@@ -110,7 +109,7 @@ def add_snippet_dialog(repository: BaseSnippetRepository):
             st.rerun()
 
 
-@st.dialog("Edit Snippet / Command", width="large")
+@st.dialog("Edit Snippet / Command", width="small")
 def edit_snippet_dialog(repository: BaseSnippetRepository, snippet: Snippet):
     # Fetch fresh list for category selectbox
     snippets = repository.get_all()
@@ -149,7 +148,9 @@ def edit_snippet_dialog(repository: BaseSnippetRepository, snippet: Snippet):
         if snippet_type == "Code"
         else ["bash", "plaintext"]
     )
-    lang_index = lang_options.index(snippet.language) if snippet.language in lang_options else 0
+    lang_index = (
+        lang_options.index(snippet.language) if snippet.language in lang_options else 0
+    )
     language = render_selectbox(
         "Syntax Highlighting",
         options=lang_options,
@@ -208,7 +209,12 @@ def edit_snippet_dialog(repository: BaseSnippetRepository, snippet: Snippet):
 
     col1, col2, col3 = st.columns([1.2, 1.2, 3])
     with col1:
-        if render_button("Save Changes", type="primary", use_container_width=True, key=f"edit_save_{snippet.id}"):
+        if render_button(
+            "Save Changes",
+            type="primary",
+            use_container_width=True,
+            key=f"edit_save_{snippet.id}",
+        ):
             if not title.strip():
                 st.error("Please enter a title.")
             elif not content.strip():
@@ -231,7 +237,9 @@ def edit_snippet_dialog(repository: BaseSnippetRepository, snippet: Snippet):
                 st.success("Changes saved!")
                 st.rerun()
     with col2:
-        if render_button("Cancel", use_container_width=True, key=f"edit_cancel_{snippet.id}"):
+        if render_button(
+            "Cancel", use_container_width=True, key=f"edit_cancel_{snippet.id}"
+        ):
             st.rerun()
 
 
@@ -660,16 +668,18 @@ def theme_gallery_dialog(settings_repo):
 def shortcuts_dialog(settings_repo):
     import json
     from ui.styles import get_keyboard_shortcuts, DEFAULT_KEYBOARD_SHORTCUTS
-    
-    st.markdown("Customize keyboard shortcuts. Refresh the page to apply new bindings. Keyboard combinations must be formatted like: `Alt+N`, `Ctrl+Shift+A`, `Alt+/` etc.")
-    
+
+    st.markdown(
+        "Customize keyboard shortcuts. Refresh the page to apply new bindings. Keyboard combinations must be formatted like: `Alt+N`, `Ctrl+Shift+A`, `Alt+/` etc."
+    )
+
     shortcuts = get_keyboard_shortcuts(settings_repo)
-    
+
     st.write("---")
-    
+
     col_labels, col_inputs = st.columns([1.8, 1.2])
     new_shortcuts = {}
-    
+
     # 1. Add Snippet Shortcut
     with col_labels:
         st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
@@ -679,9 +689,9 @@ def shortcuts_dialog(settings_repo):
             "Add Snippet Key",
             value=shortcuts.get("add_snippet", "Alt+N"),
             label_visibility="collapsed",
-            key="shortcut_add_snippet"
+            key="shortcut_add_snippet",
         )
-        
+
     # 2. Toggle Sidebar Shortcut
     with col_labels:
         st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
@@ -691,9 +701,9 @@ def shortcuts_dialog(settings_repo):
             "Toggle Sidebar Key",
             value=shortcuts.get("toggle_sidebar", "Alt+S"),
             label_visibility="collapsed",
-            key="shortcut_toggle_sidebar"
+            key="shortcut_toggle_sidebar",
         )
-        
+
     # 3. Show Shortcuts Shortcut
     with col_labels:
         st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
@@ -703,13 +713,18 @@ def shortcuts_dialog(settings_repo):
             "Show Shortcuts Key",
             value=shortcuts.get("show_shortcuts", "Alt+/"),
             label_visibility="collapsed",
-            key="shortcut_show_shortcuts"
+            key="shortcut_show_shortcuts",
         )
-        
+
     st.write("---")
     btn_col1, btn_col2 = st.columns(2)
     with btn_col1:
-        if render_button("Save Shortcuts", type="primary", use_container_width=True, key="save_shortcuts_btn"):
+        if render_button(
+            "Save Shortcuts",
+            type="primary",
+            use_container_width=True,
+            key="save_shortcuts_btn",
+        ):
             valid = True
             for k, v in new_shortcuts.items():
                 if not v.strip():
@@ -717,11 +732,21 @@ def shortcuts_dialog(settings_repo):
                     valid = False
                     break
             if valid:
-                settings_repo.set("keyboard_shortcuts", json.dumps({k: v.strip() for k, v in new_shortcuts.items()}))
+                settings_repo.set(
+                    "keyboard_shortcuts",
+                    json.dumps({k: v.strip() for k, v in new_shortcuts.items()}),
+                )
                 st.success("Shortcuts saved! Rerunning...")
                 st.rerun()
     with btn_col2:
-        if render_button("Reset to Defaults", type="secondary", use_container_width=True, key="reset_shortcuts_btn"):
-            settings_repo.set("keyboard_shortcuts", json.dumps(DEFAULT_KEYBOARD_SHORTCUTS))
+        if render_button(
+            "Reset to Defaults",
+            type="secondary",
+            use_container_width=True,
+            key="reset_shortcuts_btn",
+        ):
+            settings_repo.set(
+                "keyboard_shortcuts", json.dumps(DEFAULT_KEYBOARD_SHORTCUTS)
+            )
             st.success("Shortcuts reset to defaults! Rerunning...")
             st.rerun()
