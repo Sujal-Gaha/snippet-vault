@@ -22,6 +22,10 @@ class BaseSnippetRepository(ABC):
     def update_category(self, snippet_id: int, category: str):
         pass
 
+    @abstractmethod
+    def update(self, snippet: Snippet):
+        pass
+
     @staticmethod
     def get_existing_categories(snippets):
         """Helper to extract distinct category names from a list of Snippet instances."""
@@ -83,6 +87,26 @@ class SQLSnippetRepository(BaseSnippetRepository):
         p = self.db_manager.placeholder
         c.execute(
             f"UPDATE snippets SET category = {p} WHERE id = {p}", (category, snippet_id)
+        )
+        conn.commit()
+        conn.close()
+
+    def update(self, snippet: Snippet):
+        conn = self.db_manager.get_connection()
+        c = conn.cursor()
+        p = self.db_manager.placeholder
+        c.execute(
+            f"UPDATE snippets SET title = {p}, content = {p}, description = {p}, tags = {p}, type = {p}, language = {p}, category = {p} WHERE id = {p}",
+            (
+                snippet.title,
+                snippet.content,
+                snippet.description,
+                snippet.tags_csv,
+                snippet.type,
+                snippet.language,
+                snippet.category,
+                snippet.id,
+            ),
         )
         conn.commit()
         conn.close()

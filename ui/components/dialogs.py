@@ -110,6 +110,131 @@ def add_snippet_dialog(repository: BaseSnippetRepository):
             st.rerun()
 
 
+@st.dialog("Edit Snippet / Command", width="large")
+def edit_snippet_dialog(repository: BaseSnippetRepository, snippet: Snippet):
+    # Fetch fresh list for category selectbox
+    snippets = repository.get_all()
+    existing_cats = repository.get_existing_categories(snippets)
+
+    title = render_text_input(
+        "Title",
+        value=snippet.title,
+        placeholder="e.g. Docker Clean Containers",
+        max_chars=100,
+        key=f"edit_title_{snippet.id}",
+    )
+
+    type_options = ["Code", "Command"]
+    type_index = type_options.index(snippet.type) if snippet.type in type_options else 0
+    snippet_type = st.radio(
+        "Type",
+        type_options,
+        index=type_index,
+        horizontal=True,
+        key=f"edit_type_{snippet.id}",
+    )
+
+    lang_options = (
+        [
+            "bash",
+            "python",
+            "javascript",
+            "sql",
+            "html",
+            "css",
+            "json",
+            "yaml",
+            "plaintext",
+        ]
+        if snippet_type == "Code"
+        else ["bash", "plaintext"]
+    )
+    lang_index = lang_options.index(snippet.language) if snippet.language in lang_options else 0
+    language = render_selectbox(
+        "Syntax Highlighting",
+        options=lang_options,
+        index=lang_index,
+        key=f"edit_lang_{snippet.id}",
+    )
+
+    content = render_text_area(
+        "Snippet / Command",
+        value=snippet.content,
+        placeholder="Paste code or command line here...",
+        height=150,
+        key=f"edit_content_{snippet.id}",
+    )
+    description = render_text_area(
+        "Description (supports Markdown)",
+        value=snippet.description or "",
+        placeholder="What does this do? Supports **bold**, *italics*, `code`, lists, tables, links...",
+        height=100,
+        key=f"edit_desc_{snippet.id}",
+    )
+
+    # Category selection & creation
+    cat_col1, cat_col2 = st.columns(2)
+    with cat_col1:
+        cat_index = (
+            existing_cats.index(snippet.category)
+            if snippet.category in existing_cats
+            else (
+                existing_cats.index("Uncategorized")
+                if "Uncategorized" in existing_cats
+                else 0
+            )
+        )
+        cat_sel = render_selectbox(
+            "Assign Category",
+            options=existing_cats,
+            index=cat_index,
+            help="Select an existing category from the dropdown",
+            key=f"edit_cat_sel_{snippet.id}",
+        )
+    with cat_col2:
+        cat_new = render_text_input(
+            "Or Create New Category",
+            placeholder="e.g. Databases, Docker, Git",
+            help="Type to create and assign a new category (overrides selection)",
+            key=f"edit_cat_new_{snippet.id}",
+        )
+
+    tags = render_text_input(
+        "Tags (comma-separated)",
+        value=snippet.tags_csv,
+        placeholder="e.g. docker, devops, cleanup",
+        key=f"edit_tags_{snippet.id}",
+    )
+
+    col1, col2, col3 = st.columns([1.2, 1.2, 3])
+    with col1:
+        if render_button("Save Changes", type="primary", use_container_width=True, key=f"edit_save_{snippet.id}"):
+            if not title.strip():
+                st.error("Please enter a title.")
+            elif not content.strip():
+                st.error("Please enter snippet/command content.")
+            else:
+                final_cat = cat_new.strip() if cat_new.strip() else cat_sel
+                if not final_cat:
+                    final_cat = "Uncategorized"
+
+                # Update snippet properties and save
+                snippet.title = title.strip()
+                snippet.content = content.strip()
+                snippet.description = description.strip()
+                snippet.tags = [t.strip() for t in tags.split(",") if t.strip()]
+                snippet.type = snippet_type
+                snippet.language = language
+                snippet.category = final_cat
+
+                repository.update(snippet)
+                st.success("Changes saved!")
+                st.rerun()
+    with col2:
+        if render_button("Cancel", use_container_width=True, key=f"edit_cancel_{snippet.id}"):
+            st.rerun()
+
+
 @st.dialog("Snippet Details", width="large")
 def view_snippet_dialog(snippet: Snippet):
     badge_type = "code" if snippet.type == "Code" else "command"

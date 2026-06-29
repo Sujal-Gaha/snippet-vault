@@ -39,6 +39,16 @@ class SnippetUIRenderer:
         ):
             st.markdown("Options")
 
+            if render_button(
+                "Edit Snippet",
+                key=f"{prefix}edit_btn_{snippet.id}",
+                type="secondary",
+                use_container_width=True,
+            ):
+                from ui.components.dialogs import edit_snippet_dialog
+                edit_snippet_dialog(self.repository, snippet)
+
+            st.markdown("---")
             st.markdown("**Move Category**")
             new_cat_sel = render_selectbox(
                 "Destination Category",
