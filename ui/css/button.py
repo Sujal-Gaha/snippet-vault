@@ -49,6 +49,19 @@ div[data-testid="stPopoverBody"] {
 div[data-testid="stPopoverBody"] * {
     color: var(--popover-foreground) !important;
 }
+/* Reset all inner div borders, background-colors, and shadows inside popovers (except select and input components) */
+[data-testid="stPopoverBody"] div:not([data-baseweb="select"]):not([data-baseweb="select"] div):not([data-baseweb="input"]):not([data-baseweb="input"] div):not([data-baseweb="base-input"]):not([data-baseweb="base-input"] div),
+div[class*="stPopoverBody"] div:not([data-baseweb="select"]):not([data-baseweb="select"] div):not([data-baseweb="input"]):not([data-baseweb="input"] div):not([data-baseweb="base-input"]):not([data-baseweb="base-input"] div) {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+[data-testid="stPopoverBody"] [data-testid="stVerticalBlockBorderWrapper"],
+div[class*="stPopoverBody"] [data-testid="stVerticalBlockBorderWrapper"] {
+    padding: 0 !important;
+    margin: 0 !important;
+}
 
 /* Style the st.popover trigger buttons to look like a clean, borderless menu icon */
 div[data-testid="stPopover"] button {
