@@ -35,7 +35,8 @@ class DatabaseManager:
                 type TEXT NOT NULL,
                 language TEXT NOT NULL,
                 category TEXT DEFAULT 'Uncategorized',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP
             )
         """)
         c.execute("""
@@ -45,12 +46,16 @@ class DatabaseManager:
             )
         """)
 
-        # Migration check: check if category exists in SQLite
+        # Migration check: check if columns exist in SQLite
         c.execute("PRAGMA table_info(snippets)")
         columns = [col[1] for col in c.fetchall()]
         if "category" not in columns:
             c.execute(
                 "ALTER TABLE snippets ADD COLUMN category TEXT DEFAULT 'Uncategorized'"
+            )
+        if "updated_at" not in columns:
+            c.execute(
+                "ALTER TABLE snippets ADD COLUMN updated_at TIMESTAMP"
             )
 
         conn.commit()

@@ -255,7 +255,10 @@ def view_snippet_dialog(snippet: Snippet):
     )
 
     st.title(snippet.title)
-    st.markdown(f"**Added on:** {format_date(snippet.created_at)}")
+    updated_info = ""
+    if hasattr(snippet, "updated_at") and snippet.updated_at and snippet.updated_at != snippet.created_at:
+        updated_info = f" | **Last updated:** {format_date(snippet.updated_at)}"
+    st.markdown(f"**Added on:** {format_date(snippet.created_at)}{updated_info}")
     st.markdown("---")
 
     if snippet.description:

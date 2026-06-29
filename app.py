@@ -19,6 +19,12 @@ from ui.components import (
     theme_gallery_dialog,
     shortcuts_dialog,
 )
+from utils.export import (
+    export_to_json,
+    export_to_csv,
+    export_to_markdown,
+    export_to_zip,
+)
 
 # Page Configuration
 st.set_page_config(
@@ -96,6 +102,43 @@ with st.sidebar:
     ):
         st.session_state.show_shortcuts = True
         st.rerun()
+
+    st.markdown("---")
+    st.header("Export Snippets")
+    if snippets:
+        export_format = render_selectbox(
+            "Select Format",
+            options=["JSON", "CSV", "Markdown (Single File)", "Markdown (ZIP Archive)"],
+            key="export_format_select",
+        )
+
+        # Prepare export files
+        if export_format == "JSON":
+            data = export_to_json(snippets)
+            mime = "application/json"
+            filename = "snippets_export.json"
+        elif export_format == "CSV":
+            data = export_to_csv(snippets)
+            mime = "text/csv"
+            filename = "snippets_export.csv"
+        elif export_format == "Markdown (Single File)":
+            data = export_to_markdown(snippets)
+            mime = "text/markdown"
+            filename = "snippets_export.md"
+        else:  # ZIP Archive
+            data = export_to_zip(snippets)
+            mime = "application/zip"
+            filename = "snippets_export.zip"
+
+        st.download_button(
+            label=f"Download {export_format}",
+            data=data,
+            file_name=filename,
+            mime=mime,
+            use_container_width=True,
+        )
+    else:
+        st.info("No snippets to export.")
 
 # Main Area - Search & Filtering
 if not snippets:

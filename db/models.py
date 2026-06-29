@@ -13,6 +13,7 @@ class Snippet:
         language,
         category,
         created_at=None,
+        updated_at=None,
     ):
         self.id = id_val
         self.title = title
@@ -29,6 +30,7 @@ class Snippet:
         self.language = language
         self.category = category or "Uncategorized"
         self.created_at = created_at or datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.updated_at = updated_at or self.created_at
 
     @property
     def tags_csv(self):
@@ -49,4 +51,5 @@ class Snippet:
             language=row_dict.get("language"),
             category=row_dict.get("category"),
             created_at=row_dict.get("created_at"),
+            updated_at=row_dict.get("updated_at"),
         )

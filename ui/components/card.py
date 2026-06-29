@@ -25,6 +25,10 @@ def _render_snippet_header_html(snippet: Snippet) -> str:
     escaped_title = html.escape(snippet.title)
     date_str = format_date(snippet.created_at)
 
+    updated_info = ""
+    if hasattr(snippet, "updated_at") and snippet.updated_at and snippet.updated_at != snippet.created_at:
+        updated_info = f" • Edited on {format_date(snippet.updated_at)}"
+
     return (
         f"<div>"
         f'<span class="snippet-title">{escaped_title}</span>'
@@ -33,7 +37,7 @@ def _render_snippet_header_html(snippet: Snippet) -> str:
         f"{cat_html}"
         f"</div>"
         f'<div style="color: var(--text-color); opacity: 0.65; font-size: 0.75rem; margin-top: 4px; margin-bottom: 8px;">'
-        f"Added on {date_str}</div>"
+        f"Added on {date_str}{updated_info}</div>"
     )
 
 
