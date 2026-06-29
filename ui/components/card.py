@@ -26,7 +26,11 @@ def _render_snippet_header_html(snippet: Snippet) -> str:
     date_str = format_date(snippet.created_at)
 
     updated_info = ""
-    if hasattr(snippet, "updated_at") and snippet.updated_at and snippet.updated_at != snippet.created_at:
+    if (
+        hasattr(snippet, "updated_at")
+        and snippet.updated_at
+        and snippet.updated_at != snippet.created_at
+    ):
         updated_info = f" • Edited on {format_date(snippet.updated_at)}"
 
     return (
@@ -54,9 +58,10 @@ def _render_grid_header_html(snippet: Snippet) -> str:
 
     return (
         f'<div style="min-height: 64px;">'
+        f'<div class="snippet-title" style="font-size: 0.95rem; margin-top: 4px;">{escaped_title}</div>'
+        f"<br/>"
         f"{badge_html}"
         f"{cat_html}"
-        f'<div class="snippet-title" style="font-size: 0.95rem; margin-top: 4px;">{escaped_title}</div>'
         f"</div>"
     )
 
