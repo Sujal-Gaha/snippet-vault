@@ -11,6 +11,22 @@ input {
     font-size: 0.85rem !important;
 }
 
+/* Fix inner input styling inside selectboxes to prevent double borders and weird nested input backgrounds */
+div[data-baseweb="select"] input,
+div[data-baseweb="select"] input:hover,
+div[data-baseweb="select"] input:focus,
+div[data-testid="stVirtualDropdown"] input,
+div[data-testid="stVirtualDropdown"] input:hover,
+div[data-testid="stVirtualDropdown"] input:focus,
+div[data-baseweb="popover"] input,
+div[data-baseweb="popover"] input:hover,
+div[data-baseweb="popover"] input:focus {
+    border: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
 div[data-baseweb="select"] *, 
 div[data-baseweb="input"] *,
 div[data-baseweb="base-input"] * {
