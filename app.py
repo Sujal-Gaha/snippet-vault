@@ -278,7 +278,24 @@ st.iframe(
                 if (e.shiftKey !== hasShift) return false;
                 
                 const eventKey = e.key ? e.key.toLowerCase() : '';
-                return eventKey === keyPart;
+                const eventCode = e.code ? e.code.toLowerCase() : '';
+                
+                let codeMatch = false;
+                if (keyPart.length === 1) {{
+                    if (keyPart >= 'a' && keyPart <= 'z') {{
+                        codeMatch = (eventCode === 'key' + keyPart);
+                    }} else if (keyPart >= '0' && keyPart <= '9') {{
+                        codeMatch = (eventCode === 'digit' + keyPart);
+                    }}
+                }}
+                
+                // Common punctuation/special keys mappings
+                if (keyPart === '/') codeMatch = codeMatch || (eventCode === 'slash');
+                if (keyPart === 'space') codeMatch = codeMatch || (eventCode === 'space');
+                if (keyPart === 'enter') codeMatch = codeMatch || (eventCode === 'enter');
+                if (keyPart === 'escape') codeMatch = codeMatch || (eventCode === 'escape');
+                
+                return eventKey === keyPart || codeMatch;
             }}
             
             parentDoc.addEventListener('keydown', function(e) {{
