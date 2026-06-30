@@ -735,7 +735,20 @@ def shortcuts_dialog(settings_repo):
             key="shortcut_show_shortcuts",
         )
 
+    # 4. Toggle Chatbot Shortcut
+    with col_labels:
+        st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+        st.markdown("**Toggle AI Chatbot**")
+    with col_inputs:
+        new_shortcuts["toggle_chatbot"] = render_text_input(
+            "Toggle Chatbot Key",
+            value=shortcuts.get("toggle_chatbot", "Alt+C"),
+            label_visibility="collapsed",
+            key="shortcut_toggle_chatbot",
+        )
+
     st.write("---")
+
     btn_col1, btn_col2 = st.columns(2)
     with btn_col1:
         if render_button(

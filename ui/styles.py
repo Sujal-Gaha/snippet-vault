@@ -29,6 +29,7 @@ DEFAULT_KEYBOARD_SHORTCUTS = {
     "add_snippet": "Alt+N",
     "toggle_sidebar": "Alt+S",
     "show_shortcuts": "Alt+/",
+    "toggle_chatbot": "Alt+C",
 }
 
 
@@ -321,3 +322,144 @@ def inject_custom_styles(settings_repo):
 {joined_css}
     </style>
     """)
+
+
+def inject_keyboard_shortcuts(shortcuts):
+    """Injects iframe script to listen for keyboard shortcuts globally."""
+    st.iframe(
+        f"""
+    <script>
+        (function() {{
+            try {{
+                const parentWin = window.parent;
+                const parentDoc = parentWin.document;
+                
+                // Always update shortcuts config in the parent window namespace
+                parentWin.__shortcuts_config__ = {json.dumps(shortcuts)};
+                
+                if (parentWin.__shortcut_attached__) {{
+                    return;
+                }}
+                parentWin.__shortcut_attached__ = true;
+                
+                function matchShortcut(e, shortcutStr) {{
+                    if (!shortcutStr) return false;
+                    const parts = shortcutStr.split('+').map(p => p.trim().toLowerCase());
+                    const hasAlt = parts.includes('alt');
+                    const hasCtrl = parts.includes('ctrl');
+                    const hasShift = parts.includes('shift');
+                    
+                    const keyPart = parts.find(p => p !== 'alt' && p !== 'ctrl' && p !== 'shift');
+                    if (!keyPart) return false;
+                    
+                    if (e.altKey !== hasAlt) return false;
+                    if (e.ctrlKey !== hasCtrl) return false;
+                    if (e.shiftKey !== hasShift) return false;
+                    
+                    const eventKey = e.key ? e.key.toLowerCase() : '';
+                    const eventCode = e.code ? e.code.toLowerCase() : '';
+                    
+                    let codeMatch = false;
+                    if (keyPart.length === 1) {{
+                        if (keyPart >= 'a' && keyPart <= 'z') {{
+                            codeMatch = (eventCode === 'key' + keyPart);
+                        }} else if (keyPart >= '0' && keyPart <= '9') {{
+                            codeMatch = (eventCode === 'digit' + keyPart);
+                        }}
+                    }}
+                    
+                    // Common punctuation/special keys mappings
+                    if (keyPart === '/') codeMatch = codeMatch || (eventCode === 'slash');
+                    if (keyPart === 'space') codeMatch = codeMatch || (eventCode === 'space');
+                    if (keyPart === 'enter') codeMatch = codeMatch || (eventCode === 'enter');
+                    if (keyPart === 'escape') codeMatch = codeMatch || (eventCode === 'escape');
+                    
+                    return eventKey === keyPart || codeMatch;
+                }}
+                
+                parentDoc.addEventListener('keydown', function(e) {{
+                    try {{
+                        // Check if user is typing in a form input or text area
+                        const active = parentDoc.activeElement;
+                        if (active && (
+                            active.tagName === 'INPUT' || 
+                            active.tagName === 'TEXTAREA' || 
+                            active.contentEditable === 'true' ||
+                            active.closest('.stTextInput') ||
+                            active.closest('.stTextArea')
+                        )) {{
+                            return; 
+                        }}
+                        
+                        const currentShortcuts = parentWin.__shortcuts_config__ || {{}};
+                        
+                        // 1. Add Snippet Shortcut
+                        if (matchShortcut(e, currentShortcuts.add_snippet)) {{
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            const buttons = Array.from(parentDoc.querySelectorAll('button'));
+                            const addBtn = buttons.find(btn => btn.textContent && btn.textContent.includes('Add Snippet'));
+                            if (addBtn) {{
+                                addBtn.click();
+                            }}
+                        }}
+                        
+                        // 2. Toggle Sidebar Shortcut
+                        if (matchShortcut(e, currentShortcuts.toggle_sidebar)) {{
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            const expandBtn = parentDoc.querySelector('[data-testid="collapsedControl"]') || 
+                                              parentDoc.querySelector('button[aria-label="Expand sidebar"]');
+                            if (expandBtn) {{
+                                expandBtn.click();
+                            }} else {{
+                                const collapseBtn = parentDoc.querySelector('[data-testid="stSidebarCollapseButton"]') || 
+                                                    parentDoc.querySelector('button[aria-label="Collapse sidebar"]');
+                                if (collapseBtn) {{
+                                    const actualBtn = collapseBtn.tagName === 'BUTTON' ? collapseBtn : collapseBtn.querySelector('button');
+                                    if (actualBtn) {{
+                                        actualBtn.click();
+                                    }} else {{
+                                        collapseBtn.click();
+                                    }}
+                                }}
+                            }}
+                        }}
+                        
+                        // 3. Show Shortcuts Shortcut
+                        if (matchShortcut(e, currentShortcuts.show_shortcuts)) {{
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            const buttons = Array.from(parentDoc.querySelectorAll('button'));
+                            const configBtn = buttons.find(btn => btn.textContent && btn.textContent.includes('Configure Shortcuts'));
+                            if (configBtn) {{
+                                configBtn.click();
+                            }}
+                        }}
+                        
+                        // 4. Toggle Chatbot Shortcut
+                        if (matchShortcut(e, currentShortcuts.toggle_chatbot)) {{
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            const checkbox = parentDoc.querySelector('#chatbot-toggle-checkbox') || 
+                                             document.querySelector('#chatbot-toggle-checkbox');
+                            if (checkbox) {{
+                                checkbox.click();
+                            }}
+                        }}
+                    }} catch (err) {{
+                        console.error("Error in shortcut keydown listener:", err);
+                    }}
+                }}, true);
+            }} catch (e) {{
+                console.error("Failed to attach global keydown listener from iframe:", e);
+            }}
+        }})();
+    </script>
+    """,
+        height=1,
+    )
