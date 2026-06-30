@@ -48,14 +48,16 @@ def format_font_family_string(font_str):
     if not font_str:
         return font_str
     parts = []
-    for p in font_str.split(','):
+    for p in font_str.split(","):
         p = p.strip()
         if not p:
             continue
         # Check if already quoted
-        if (p.startswith('"') and p.endswith('"')) or (p.startswith("'") and p.endswith("'")):
+        if (p.startswith('"') and p.endswith('"')) or (
+            p.startswith("'") and p.endswith("'")
+        ):
             parts.append(p)
-        elif ' ' in p:
+        elif " " in p:
             # Multi-word family name not quoted, wrap in double quotes
             parts.append(f'"{p}"')
         else:
@@ -68,19 +70,43 @@ def get_font_imports(theme_colors):
     font_sans = theme_colors.get("font_sans", "")
     font_serif = theme_colors.get("font_serif", "")
     font_mono = theme_colors.get("font_mono", "")
-    
+
     font_values = [font_sans, font_serif, font_mono]
     detected_families = []
-    
+
     system_fonts = {
-        "sans-serif", "serif", "monospace", "system-ui", "ui-sans-serif", "ui-serif", 
-        "ui-monospace", "segoe ui", "apple-system", "blinkmacsystemfont", "roboto", 
-        "helvetica neue", "arial", "noto sans", "apple color emoji", "segoe ui emoji", 
-        "segoe ui symbol", "noto color emoji", "georgia", "cambria", "times new roman", 
-        "times", "courier new", "courier", "menlo", "monaco", "consolas", "liberation mono",
-        "sfmono-regular", "helvetica"
+        "sans-serif",
+        "serif",
+        "monospace",
+        "system-ui",
+        "ui-sans-serif",
+        "ui-serif",
+        "ui-monospace",
+        "segoe ui",
+        "apple-system",
+        "blinkmacsystemfont",
+        "roboto",
+        "helvetica neue",
+        "arial",
+        "noto sans",
+        "apple color emoji",
+        "segoe ui emoji",
+        "segoe ui symbol",
+        "noto color emoji",
+        "georgia",
+        "cambria",
+        "times new roman",
+        "times",
+        "courier new",
+        "courier",
+        "menlo",
+        "monaco",
+        "consolas",
+        "liberation mono",
+        "sfmono-regular",
+        "helvetica",
     }
-    
+
     google_fonts_mapping = {
         "architects daughter": "Architects+Daughter",
         "montserrat": "Montserrat:ital,wght@0,100..900;1,100..900",
@@ -90,19 +116,19 @@ def get_font_imports(theme_colors):
         "dm serif text": "DM+Serif+Text:ital@0;1",
         "dm mono": "DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500",
     }
-    
+
     for val in font_values:
         if not val:
             continue
         # Split by comma to extract font families
-        parts = [p.strip().strip('"\'') for p in val.split(',')]
+        parts = [p.strip().strip("\"'") for p in val.split(",")]
         for part in parts:
             if not part:
                 continue
             part_lower = part.lower()
             if part_lower in system_fonts:
                 continue
-            
+
             # Match mapped ones
             if part_lower in google_fonts_mapping:
                 param = google_fonts_mapping[part_lower]
@@ -115,10 +141,10 @@ def get_font_imports(theme_colors):
                 # Keep parameter unique
                 if param not in detected_families:
                     detected_families.append(param)
-                    
+
     if not detected_families:
         return ""
-        
+
     # Construct Google Fonts URL
     families_query = "&".join([f"family={fam}" for fam in detected_families])
     return f"@import url('https://fonts.googleapis.com/css2?{families_query}&display=swap');\n"
@@ -152,7 +178,9 @@ def inject_custom_styles(settings_repo):
     secondary = theme_colors.get("secondary", sec_bg)
     secondary_foreground = theme_colors.get("secondary_foreground", text)
     muted = theme_colors.get("muted", sec_bg)
-    muted_foreground = theme_colors.get("muted_foreground", f"color-mix(in srgb, {text} 60%, transparent)")
+    muted_foreground = theme_colors.get(
+        "muted_foreground", f"color-mix(in srgb, {text} 60%, transparent)"
+    )
     accent = theme_colors.get("accent", sec_bg)
     accent_foreground = theme_colors.get("accent_foreground", primary)
     destructive = theme_colors.get("destructive", "oklch(0.704 0.191 22.216)")
@@ -175,9 +203,23 @@ def inject_custom_styles(settings_repo):
     sidebar_border = theme_colors.get("sidebar_border", border)
     sidebar_ring = theme_colors.get("sidebar_ring", primary)
 
-    font_sans = format_font_family_string(theme_colors.get("font_sans", '"Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif'))
-    font_serif = format_font_family_string(theme_colors.get("font_serif", 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif'))
-    font_mono = format_font_family_string(theme_colors.get("font_mono", 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'))
+    font_sans = format_font_family_string(
+        theme_colors.get(
+            "font_sans",
+            '"Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif',
+        )
+    )
+    font_serif = format_font_family_string(
+        theme_colors.get(
+            "font_serif", 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif'
+        )
+    )
+    font_mono = format_font_family_string(
+        theme_colors.get(
+            "font_mono",
+            "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+        )
+    )
 
     radius = theme_colors.get("radius", "12px")
     border_width = theme_colors.get("border_width", "1px")
@@ -222,7 +264,6 @@ def inject_custom_styles(settings_repo):
         "clr_sec_bg": sec_bg,
         "clr_text": text,
         "clr_border": border,
-        
         "background": bg,
         "foreground": foreground,
         "card": card,

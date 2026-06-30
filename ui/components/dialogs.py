@@ -559,7 +559,10 @@ def theme_gallery_dialog(settings_repo):
                     ):
                         save_themes_config(settings_repo, name, custom_themes)
                         st.session_state.temp_theme = name
-                        st.session_state.toast_message = (f"Theme '{name}' applied!", None)
+                        st.session_state.toast_message = (
+                            f"Theme '{name}' applied!",
+                            None,
+                        )
                         st.rerun()
 
     with tab2:
@@ -586,7 +589,10 @@ def theme_gallery_dialog(settings_repo):
                         ):
                             save_themes_config(settings_repo, name, custom_themes)
                             st.session_state.temp_theme = name
-                            st.session_state.toast_message = (f"Theme '{name}' applied!", None)
+                            st.session_state.toast_message = (
+                                f"Theme '{name}' applied!",
+                                None,
+                            )
                             st.rerun()
 
                         # Floating delete button
@@ -604,7 +610,10 @@ def theme_gallery_dialog(settings_repo):
                             )
                             save_themes_config(settings_repo, new_sel, custom_themes)
                             st.session_state.temp_theme = new_sel
-                            st.session_state.toast_message = (f"Theme '{name}' deleted!", None)
+                            st.session_state.toast_message = (
+                                f"Theme '{name}' deleted!",
+                                None,
+                            )
                             st.rerun()
 
         st.markdown("---")
@@ -667,7 +676,10 @@ def theme_gallery_dialog(settings_repo):
                 }
                 save_themes_config(settings_repo, custom_name, custom_themes)
                 st.session_state.temp_theme = custom_name
-                st.session_state.toast_message = (f"Theme '{custom_name}' applied and saved!", None)
+                st.session_state.toast_message = (
+                    f"Theme '{custom_name}' applied and saved!",
+                    None,
+                )
                 st.rerun()
 
 

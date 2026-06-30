@@ -54,9 +54,7 @@ class DatabaseManager:
                 "ALTER TABLE snippets ADD COLUMN category TEXT DEFAULT 'Uncategorized'"
             )
         if "updated_at" not in columns:
-            c.execute(
-                "ALTER TABLE snippets ADD COLUMN updated_at TIMESTAMP"
-            )
+            c.execute("ALTER TABLE snippets ADD COLUMN updated_at TIMESTAMP")
 
         conn.commit()
         conn.close()

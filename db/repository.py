@@ -98,9 +98,11 @@ class SQLSnippetRepository(BaseSnippetRepository):
         c = conn.cursor()
         p = self.db_manager.placeholder
         from datetime import datetime
+
         now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         c.execute(
-            f"UPDATE snippets SET category = {p}, updated_at = {p} WHERE id = {p}", (category, now_str, snippet_id)
+            f"UPDATE snippets SET category = {p}, updated_at = {p} WHERE id = {p}",
+            (category, now_str, snippet_id),
         )
         conn.commit()
         conn.close()
@@ -110,6 +112,7 @@ class SQLSnippetRepository(BaseSnippetRepository):
         c = conn.cursor()
         p = self.db_manager.placeholder
         from datetime import datetime
+
         snippet.updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         c.execute(
             f"UPDATE snippets SET title = {p}, content = {p}, description = {p}, tags = {p}, type = {p}, language = {p}, category = {p}, updated_at = {p} WHERE id = {p}",

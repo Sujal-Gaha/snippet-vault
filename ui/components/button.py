@@ -1,6 +1,7 @@
 from typing import Literal, Optional
 import streamlit as st
 
+
 def render_button(
     label: str,
     key: Optional[str] = None,
