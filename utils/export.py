@@ -5,73 +5,92 @@ import re
 import zipfile
 from db.models import Snippet
 
+
 def clean_filename(name: str) -> str:
     """Cleans a string to make it safe for filenames."""
     if not name:
         return "untitled"
     # Keep only alphanumeric, space, hyphens, underscores
-    cleaned = re.sub(r'[^\w\s-]', '', name).strip()
-    cleaned = re.sub(r'\s+', '_', cleaned)
+    cleaned = re.sub(r"[^\w\s-]", "", name).strip()
+    cleaned = re.sub(r"\s+", "_", cleaned)
     return cleaned or "untitled"
+
 
 def export_to_json(snippets: list[Snippet]) -> str:
     """Serializes snippets to a pretty-printed JSON string."""
     data = []
     for s in snippets:
-        data.append({
-            "id": s.id,
-            "title": s.title,
-            "content": s.content,
-            "description": s.description,
-            "tags": s.tags,
-            "type": s.type,
-            "language": s.language,
-            "category": s.category,
-            "created_at": s.created_at,
-            "updated_at": s.updated_at
-        })
+        data.append(
+            {
+                "id": s.id,
+                "title": s.title,
+                "content": s.content,
+                "description": s.description,
+                "tags": s.tags,
+                "type": s.type,
+                "language": s.language,
+                "category": s.category,
+                "created_at": s.created_at,
+                "updated_at": s.updated_at,
+            }
+        )
     return json.dumps(data, indent=4)
+
 
 def export_to_csv(snippets: list[Snippet]) -> str:
     """Serializes snippets to a CSV string."""
     output = io.StringIO()
     writer = csv.writer(output)
     # Write header
-    writer.writerow([
-        "id", "title", "type", "language", "category", "tags", "description", "content", "created_at", "updated_at"
-    ])
+    writer.writerow(
+        [
+            "id",
+            "title",
+            "type",
+            "language",
+            "category",
+            "tags",
+            "description",
+            "content",
+            "created_at",
+            "updated_at",
+        ]
+    )
     for s in snippets:
-        writer.writerow([
-            s.id,
-            s.title,
-            s.type,
-            s.language,
-            s.category,
-            s.tags_csv,
-            s.description,
-            s.content,
-            s.created_at,
-            s.updated_at
-        ])
+        writer.writerow(
+            [
+                s.id,
+                s.title,
+                s.type,
+                s.language,
+                s.category,
+                s.tags_csv,
+                s.description,
+                s.content,
+                s.created_at,
+                s.updated_at,
+            ]
+        )
     return output.getvalue()
+
 
 def export_to_markdown(snippets: list[Snippet]) -> str:
     """Compiles all snippets into a single, clean Markdown document."""
     md = ["# Snippet Vault Export\n"]
-    
+
     # Group by category
     by_category = {}
     for s in snippets:
         cat = s.category or "Uncategorized"
         by_category.setdefault(cat, []).append(s)
-    
+
     for category, snips in sorted(by_category.items()):
         md.append(f"## Category: {category}\n")
         for s in snips:
             md.append(f"### {s.title}")
             if s.description:
                 md.append(f"*{s.description}*\n")
-            
+
             meta_parts = []
             meta_parts.append(f"**Type:** {s.type}")
             if s.language:
@@ -79,21 +98,22 @@ def export_to_markdown(snippets: list[Snippet]) -> str:
             if s.tags:
                 tags_list = ", ".join([f"`{t}`" for t in s.tags])
                 meta_parts.append(f"**Tags:** {tags_list}")
-            
+
             md.append(" | ".join(meta_parts) + "\n")
-            
+
             time_parts = [f"**Created:** {s.created_at}"]
             if s.updated_at and s.updated_at != s.created_at:
                 time_parts.append(f"**Updated:** {s.updated_at}")
             md.append(" | ".join(time_parts) + "\n")
-            
+
             # Code block
             lang = s.language.lower() if s.language else ""
             md.append(f"```{lang}\n{s.content}\n```\n")
             md.append("---")
         md.append("")
-    
+
     return "\n".join(md)
+
 
 def export_to_zip(snippets: list[Snippet]) -> bytes:
     """Creates a ZIP archive containing individual Markdown files for each snippet, organized by category."""
@@ -103,7 +123,7 @@ def export_to_zip(snippets: list[Snippet]) -> bytes:
         for s in snippets:
             cat_dir = clean_filename(s.category or "Uncategorized")
             base_name = clean_filename(s.title or "Snippet")
-            
+
             filename = f"{base_name}.md"
             path = f"{cat_dir}/{filename}"
             counter = 1
@@ -112,7 +132,7 @@ def export_to_zip(snippets: list[Snippet]) -> bytes:
                 path = f"{cat_dir}/{filename}"
                 counter += 1
             seen_paths.add(path.lower())
-            
+
             # Construct markdown content for this individual snippet
             md_content = []
             md_content.append("---")
@@ -128,13 +148,72 @@ def export_to_zip(snippets: list[Snippet]) -> bytes:
             md_content.append(f"created_at: {s.created_at}")
             md_content.append(f"updated_at: {s.updated_at}")
             md_content.append("---\n")
-            
+
             if s.description:
                 md_content.append(f"{s.description}\n")
-                
+
             lang = s.language.lower() if s.language else ""
             md_content.append(f"```{lang}\n{s.content}\n```")
-            
+
             zip_file.writestr(path, "\n".join(md_content))
-            
+
     return zip_buffer.getvalue()
+
+
+def export_to_sql(snippets: list[Snippet]) -> str:
+    """Serializes snippets to a SQL insert script."""
+    sql = []
+    # Add table creation statement
+    sql.append("-- Create table snippets if it does not exist")
+    sql.append("CREATE TABLE IF NOT EXISTS snippets (")
+    sql.append("    id INTEGER PRIMARY KEY AUTOINCREMENT,")
+    sql.append("    title TEXT NOT NULL,")
+    sql.append("    content TEXT NOT NULL,")
+    sql.append("    description TEXT,")
+    sql.append("    tags TEXT,")
+    sql.append("    type TEXT NOT NULL,")
+    sql.append("    language TEXT NOT NULL,")
+    sql.append("    category TEXT DEFAULT 'Uncategorized',")
+    sql.append("    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,")
+    sql.append("    updated_at TIMESTAMP")
+    sql.append(");\n")
+
+    def sql_val(val) -> str:
+        if val is None:
+            return "NULL"
+        if isinstance(val, (int, float)):
+            return str(val)
+        escaped = str(val).replace("'", "''")
+        return f"'{escaped}'"
+
+    sql.append("-- Insert snippet data")
+    for s in snippets:
+        columns = [
+            "id",
+            "title",
+            "content",
+            "description",
+            "tags",
+            "type",
+            "language",
+            "category",
+            "created_at",
+            "updated_at",
+        ]
+        values = [
+            s.id,
+            s.title,
+            s.content,
+            s.description,
+            s.tags_csv,
+            s.type,
+            s.language,
+            s.category,
+            s.created_at,
+            s.updated_at,
+        ]
+        val_str = ", ".join(sql_val(v) for v in values)
+        col_str = ", ".join(columns)
+        sql.append(f"INSERT INTO snippets ({col_str}) VALUES ({val_str});")
+
+    return "\n".join(sql)

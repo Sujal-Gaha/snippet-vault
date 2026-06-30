@@ -22,6 +22,7 @@ from ui.components import (
 from utils.export import (
     export_to_json,
     export_to_csv,
+    export_to_sql,
     export_to_markdown,
     export_to_zip,
 )
@@ -108,7 +109,7 @@ with st.sidebar:
     if snippets:
         export_format = render_selectbox(
             "Select Format",
-            options=["JSON", "CSV", "Markdown (Single File)", "Markdown (ZIP Archive)"],
+            options=["JSON", "CSV", "SQL", "Markdown (Single File)", "Markdown (ZIP Archive)"],
             key="export_format_select",
         )
 
@@ -121,6 +122,10 @@ with st.sidebar:
             data = export_to_csv(snippets)
             mime = "text/csv"
             filename = "snippets_export.csv"
+        elif export_format == "SQL":
+            data = export_to_sql(snippets)
+            mime = "application/sql"
+            filename = "snippets_export.sql"
         elif export_format == "Markdown (Single File)":
             data = export_to_markdown(snippets)
             mime = "text/markdown"
