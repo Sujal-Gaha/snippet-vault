@@ -38,6 +38,11 @@ db_manager.init_db()
 settings_repository = SQLSettingsRepository(db_manager)
 repository = SQLSnippetRepository(db_manager)
 
+# Display any deferred toasts from session state
+if "toast_message" in st.session_state:
+    msg, icon = st.session_state.pop("toast_message")
+    st.toast(msg, icon=icon)
+
 # Load data and keyboard shortcuts early
 snippets = repository.get_all()
 shortcuts = get_keyboard_shortcuts(settings_repository)
@@ -205,7 +210,7 @@ with st.sidebar:
             "Clear All Snippets", type="primary", use_container_width=True
         ):
             repository.delete_all()
-            st.toast("All snippets have been deleted.", icon="🗑️")
+            st.session_state.toast_message = ("All snippets have been deleted.", "🗑️")
             st.rerun()
 
 
