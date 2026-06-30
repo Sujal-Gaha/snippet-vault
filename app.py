@@ -109,7 +109,13 @@ with st.sidebar:
     if snippets:
         export_format = render_selectbox(
             "Select Format",
-            options=["JSON", "CSV", "SQL", "Markdown (Single File)", "Markdown (ZIP Archive)"],
+            options=[
+                "JSON",
+                "CSV",
+                "SQL",
+                "Markdown (Single File)",
+                "Markdown (ZIP Archive)",
+            ],
             key="export_format_select",
         )
 
@@ -144,6 +150,64 @@ with st.sidebar:
         )
     else:
         st.info("No snippets to export.")
+
+    st.markdown("---")
+    st.header("Import Snippets")
+
+    if "import_message" in st.session_state:
+        msg_type, msg_text = st.session_state.pop("import_message")
+        if msg_type == "success":
+            st.success(msg_text)
+        else:
+            st.error(msg_text)
+
+    uploaded_file = st.file_uploader(
+        "Upload SQL Backup (.sql)",
+        type=["sql"],
+        key="import_sql_uploader",
+        help="Upload a previously exported .sql file to restore or merge snippets.",
+    )
+    if uploaded_file is not None:
+        if render_button("Import SQL Backup", type="primary", use_container_width=True):
+            try:
+                import re
+
+                sql_content = uploaded_file.read().decode("utf-8")
+                # Rewrite INSERT INTO to INSERT OR REPLACE INTO for resolving duplicates gracefully
+                sql_content = re.sub(
+                    r"(?i)\bINSERT\s+INTO\s+snippets\b",
+                    "INSERT OR REPLACE INTO snippets",
+                    sql_content,
+                )
+
+                conn = db_manager.get_connection()
+                conn.executescript(sql_content)
+                conn.commit()
+                conn.close()
+                st.session_state.import_message = (
+                    "success",
+                    "Snippets imported successfully!",
+                )
+                st.rerun()
+            except Exception as e:
+                st.session_state.import_message = ("error", f"Failed to import: {e}")
+                st.rerun()
+
+    st.markdown("---")
+    st.header("Danger Zone")
+    confirm_clear = st.checkbox(
+        "I want to delete all snippets",
+        key="confirm_clear_checkbox",
+        help="Check this box to enable the clear database button.",
+    )
+    if confirm_clear:
+        if render_button(
+            "Clear All Snippets", type="primary", use_container_width=True
+        ):
+            repository.delete_all()
+            st.toast("All snippets have been deleted.", icon="🗑️")
+            st.rerun()
+
 
 # Main Area - Search & Filtering
 if not snippets:

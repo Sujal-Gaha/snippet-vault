@@ -19,6 +19,10 @@ class BaseSnippetRepository(ABC):
         pass
 
     @abstractmethod
+    def delete_all(self):
+        pass
+
+    @abstractmethod
     def update_category(self, snippet_id: int, category: str):
         pass
 
@@ -79,6 +83,13 @@ class SQLSnippetRepository(BaseSnippetRepository):
         c = conn.cursor()
         p = self.db_manager.placeholder
         c.execute(f"DELETE FROM snippets WHERE id = {p}", (snippet_id,))
+        conn.commit()
+        conn.close()
+
+    def delete_all(self):
+        conn = self.db_manager.get_connection()
+        c = conn.cursor()
+        c.execute("DELETE FROM snippets")
         conn.commit()
         conn.close()
 
